@@ -14,7 +14,6 @@ from flask_restful import Resource, Api
 ENV = 'develop'
 PORT = 3000
 HOST = '0.0.0.0'
-HANDLER = apiHandler(PORT, HOST, ENV, "credentials.json")
 
 # Setup Apps/API
 app = Flask(__name__)
@@ -45,6 +44,9 @@ if __name__ == "__main__":
     try:
         # Attempt to run the app
         print("Hosting Flask app on Port: " + str(PORT))
+
+        # api handler will eventually need setup, disabled for consistent testing
+        # handler = apiHandler(PORT, HOST, ENV, "credentials.json")
 
         # Run the app and get the successful exit
         app.run(host=HOST, port=PORT, debug=False)
