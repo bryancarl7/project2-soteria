@@ -1,3 +1,5 @@
-# This is where I'd put my notes #
+# ReadMe #
 
 -https://imgflip.com/i/42cv0c
+
+run wtih ./alphabuild
