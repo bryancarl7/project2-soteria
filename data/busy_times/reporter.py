@@ -29,6 +29,9 @@ import configparser
 import enum
 import os
 
+# Third Party Packages
+import populartimes
+
 class BusyTimesReporter():
     """
     The BusyTimesReporter class serves as the interface for accessing location
@@ -80,7 +83,18 @@ class BusyTimesReporter():
     @classmethod
     def get_busy_times(cls, location, mode):
         """
-        Returns an interval representing the busy times of a location.
+        Returns a set of intervals representing the busy times of a location.
+
+        Arguments:
+            location    (String)                        - Google Maps Place ID
+            mode        (Int or BusyTimesReporter.Mode) - Fetching Mode
+        Returns:
+            Dictionary                                  - Busy Times Intervals
+                Key     (String)                        - Day of the Week
+                Value   (Int List)                      - Hour Occupancy Ratios
+        Raises:
+            TypeError                                   - Bad argument passed
+            SystemError                                 - 'populartimes' failed
         """
 
         # Validate inputs
@@ -89,7 +103,53 @@ class BusyTimesReporter():
         if isinstance(mode, int) and not cls.Mode.has_value(mode):
             raise TypeError("argument 'mode' is invalid")
 
-        # Fetch API Key for accurate mode
-        API_KEY = get_api_key()
+        # Standardize input
+        if isinstance(mode, int):
+            mode = cls.Mode(mode)
 
+        DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                "Saturday", "Sunday")
+        busy_times = dict.fromkeys(DAYS)
 
+        # Fetch API Key
+        API_KEY = cls.get_api_key()
+
+        if mode == cls.Mode.ACCURATE:
+            result = None
+
+            # Ensure valid Google Maps Place ID
+            try:
+                result = populartimes.get_id(key, location)
+            except populartime.crawler.PopulartimesException:
+                raise TypeError("argument 'location' is not a valid Google Maps Place ID")
+
+            # Validate web crawler data from 'populartimes'
+            for entry in result["populartimes"]:
+                failure_flag = False
+                # Must have an entry for each hour of the day
+                if len(entry["data"]) != 24:
+                    failure_flag = True
+                else:
+                    # Entry must be defined by date
+                    if entry["name"] not in DAYS:
+                        failure_flag = True
+                    else:
+                        for ratio in entry["data"]:
+                            # Make sure entries are integers
+                            if not isinstance(ratio, int):
+                                failure_flag = True
+                                break
+                            else:
+                                # Each ratio must be in [0, 100]
+                                if ratio not in range(0, 101):
+                                    failure_flag = True
+                                    break
+                if failure_flag:
+                    raise SystemError("third party package 'populartimes' internally malformed")
+
+                busy_times[entry["name"]] = entry["data"]
+        else:
+            # TODO: Simulated Mode
+            pass
+
+        return busy_times
