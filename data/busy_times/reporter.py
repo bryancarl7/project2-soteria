@@ -119,8 +119,8 @@ class BusyTimesReporter():
 
             # Ensure valid Google Maps Place ID
             try:
-                result = populartimes.get_id(key, location)
-            except populartime.crawler.PopulartimesException:
+                result = populartimes.get_id(API_KEY, location)
+            except populartimes.crawler.PopulartimesException:
                 raise TypeError("argument 'location' is not a valid Google Maps Place ID")
 
             # Validate web crawler data from 'populartimes'
