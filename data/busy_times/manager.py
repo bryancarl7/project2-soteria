@@ -46,7 +46,7 @@ class SimulationManager():
             FileNotFoundError               - Missing simulated data file(s)
         """
 
-        valid_location_types = ("temporary": cls.files[0])
+        valid_location_types = ("temporary", cls.files[0])
 
         # Validate input
         if location_type not in valid_location_types:
