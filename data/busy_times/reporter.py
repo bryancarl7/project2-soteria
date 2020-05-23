@@ -3,7 +3,7 @@ reporter.py
 
 ===============================================================================
 
-Last Modified: 21 May 2020
+Last Modified: 22 May 2020
 Modification By: Carter Perkins
 
 Creation Date: 21 May 2020
@@ -30,7 +30,11 @@ import enum
 import os
 
 # Third Party Packages
+import googlemaps
 import populartimes
+
+# Local Modules
+from data.busy_times.manager import SimulationManager
 
 class BusyTimesReporter():
     """
@@ -89,41 +93,57 @@ class BusyTimesReporter():
             location    (String)                        - Google Maps Place ID
             mode        (Int or BusyTimesReporter.Mode) - Fetching Mode
         Returns:
-            Dictionary                                  - Busy Times Intervals
+            Dictionary                                  - Busy Time Intervals
                 Key     (String)                        - Day of the Week
                 Value   (Int List)                      - Hour Occupancy Ratios
         Raises:
-            TypeError                                   - Bad argument passed
-            SystemError                                 - 'populartimes' failed
+            TypeError                                   - Bad argument type
+            ValueError                                  - Bad argument value
+            SystemError                                 - 'populartimes' broken
+            KeyError                                    - 'populartimes' failed
         """
 
         # Validate inputs
         if not isinstance(mode, int) and not isinstance(mode, cls.Mode):
             raise TypeError("argument 'mode' must be of type int or BusyTimesReporter.Mode")
         if isinstance(mode, int) and not cls.Mode.has_value(mode):
-            raise TypeError("argument 'mode' is invalid")
+            raise ValueError("argument 'mode' is invalid")
+        if not isinstance(location, string):
+            raise TypeError("argument 'location' must be of type str")
 
         # Standardize input
         if isinstance(mode, int):
             mode = cls.Mode(mode)
 
-        DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                "Saturday", "Sunday")
-        busy_times = dict.fromkeys(DAYS)
-
         # Fetch API Key
         API_KEY = cls.get_api_key()
+        gmaps = googlemaps.Client(key=API_KEY)
+
+        busy_times = None
 
         if mode == cls.Mode.ACCURATE:
+            # Setup return
+            DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                    "Saturday", "Sunday")
+            busy_times = dict.fromkeys(DAYS)
             result = None
 
             # Ensure valid Google Maps Place ID
             try:
-                result = populartimes.get_id(API_KEY, location)
-            except populartimes.crawler.PopulartimesException:
-                raise TypeError("argument 'location' is not a valid Google Maps Place ID")
+                gmaps.place(location)
+            except googlemaps.exceptions.ApiError:
+                raise ValueError("argument 'location' is an invalid Google Maps Place ID")
+
+            # Fetch data from 'populartimes'
+            try:
+                result = populartimes.get_id(key, location)
+            except populartime.crawler.PopulartimesException:
+                raise SystemError("package 'populartimes' internally failed")
 
             # Validate web crawler data from 'populartimes'
+            if "populartimes" not in result.keys():
+                raise KeyError("package 'populartimes' could not get populartimes data")
+
             for entry in result["populartimes"]:
                 failure_flag = False
                 # Must have an entry for each hour of the day
@@ -145,11 +165,12 @@ class BusyTimesReporter():
                                     failure_flag = True
                                     break
                 if failure_flag:
-                    raise SystemError("third party package 'populartimes' internally malformed")
+                    raise SystemError("package 'populartimes' internally failed")
 
                 busy_times[entry["name"]] = entry["data"]
         else:
-            # TODO: Simulated Mode
-            pass
+            # TODO: Determine Location Type and Pass to simulation manager
+            location_type = "temporary"
+            busy_times = SimulationManager.get_busy_times(location_type)
 
         return busy_times
