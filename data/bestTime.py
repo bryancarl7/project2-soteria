@@ -1,21 +1,13 @@
 """
-reporter.py
+bestTime.py
 ===============================================================================
 Last Modified: 22 May 2020
-Modification By: Carter Perkins
-Creation Date: 21 May 2020
-Initial Author: Carter Perkins
+Modification By: Morgan Edlund
+Creation Date: 22 May 2020
+Initial Author: Bryan Carl
 ===============================================================================
-This module returns the relative "business" of a location, defined in the SDS
-Section 4.1 - Busy Times Reporter, for scheduling and optimal time algorithms
-utilized in the Flask API (aforementioned module is defined in the SDS Section
-4.2 - Flask API). Due to this design, the Busy Times Reporter is completely
-independent of all other modules.
-In short, this reporting module utilizes two modes, accurate and simulated, to
-determine how congested a particular location is. It utilizes the Google Maps
-Place API for location data, and the 'Popular times' package to scrape the
-Google Maps "Busy Times" information. Also, the simulated dataset is built
-referencing the "Busy Times" data.
+
+
 """
 import requests
 import json
@@ -24,7 +16,7 @@ import data.busy_times.reporter as time_reporter
 
 class bestTime(Resource):
     def __init__(self):
-        #self.apiHandler = api_handler #TODO Read this to init
+        #self.apiHandler = api_handler #TODO Readd this to init
         self.id = ""
 
     def get(self, request):
@@ -54,7 +46,14 @@ class bestTime(Resource):
     def get_best_time(self, location, day, test_list = None):
         '''
         string(google places API placeid), string(name of day), (optional) 0-100 ratio int list -> (hour, ratio) list
-        Returns a sorted list of times to visit a given location, with times of lowest relative population sorted first. 
+        Returns a sorted list of times to visit a given location, with times of lowest relative population sorted first.
+        if test_list is specified, it will validate and use that data for the returned list (allows for testing of logic).
+        
+        Each pair in the returned list is in the format of (hour in military time, 0-100 ratio rating of relative business). 
+
+        Raises:
+            TypeError when test_list specified and doesn't have 24 ints
+
         '''
         times = None
         hours = [i for i in range(24)]
