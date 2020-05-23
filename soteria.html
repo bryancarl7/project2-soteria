@@ -60,6 +60,10 @@ body, html {
 #SCHEDULE_INPUT {
     width: 300px;
 }
+label {
+    font-weight: 1000;
+    font-size: medium;
+}
 h1 {
     text-align: left;
     padding: 22px 16px;
@@ -76,6 +80,68 @@ input[type=text], select {
 	color: black;
 	font-size: 20px;
   }
+
+  input[type=button] {
+	width: 100%;
+	background-color: #4CAF50;
+	color: white;
+	padding: 14px 20px;
+	margin: 8px 0;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+  }
+
+  input[type=button]:hover {
+	background-color: darkolivegreen;
+  }
+  /* reference : https://stackoverflow.com/questions/53544872/how-to-style-the-input-type-time/56959849 */
+  input[type=time] {
+    border: none;
+    color: #2a2c2d;
+    font-size: 14px;
+    font-family: helvetica;
+    font-weight: bold;
+    width: 180px;
+    background-color: lightblue
+  }
+  input[type=time]::-webkit-datetime-edit-text {
+  padding: 19px 4px;
+}
+
+input[type=time]::-webkit-clear-button {
+  display: none;
+}
+
+/* Up/Down arrows for incrementing/decrementing the value */
+input[type=time]::-webkit-inner-spin-button {
+  display: none;
+}
+/* The naming convention for the hour, minute, second, and am/pm field is
+`-webkit-datetime-edit-{field}-field` */
+
+/* Hour */
+input[type=time]::-webkit-datetime-edit-hour-field {
+  background-color: lightblue;
+  border-radius: 15%;
+  padding: 19px 13px;
+}
+
+/* Minute */
+input[type=time]::-webkit-datetime-edit-minute-field {
+  background-color: lightblue;
+  border-radius: 15%;
+  padding: 19px 13px;
+}
+
+/* AM/PM */
+input[type=time]::-webkit-datetime-edit-ampm-field {
+  background-color: #7155d3;
+  border-radius: 15%;
+  color: #fff;
+  padding: 10px 13px;
+}
+
         
         </style>
         <body>
@@ -87,8 +153,12 @@ input[type=text], select {
               </div>
               <div id="BST" class="tabcontent">
                     <h3>Best Single Time</h3>
-                    <p>Best Single Time Search</p>
+                    <p>Instructions</p> 
+                    <li>1. Enter a specific place you'd like to go (e.g. specific restaurant, store, public park)</li>
+                    <li>2. Click 'Submit' to see popular times</li>
                     <input type = "text" id = "BST_INPUT">
+                    <input type = "button" id = "submit" value = "Submit" onclick = "submitBST()">
+
                   </div>
                   
                   <div id="BFT" class="tabcontent">
@@ -97,6 +167,7 @@ input[type=text], select {
                     <li>1. Enter a type of place you plan on going to (e.g. restaurant, breakfast place, golf store)</li>
                     <li>2. Click Submit</li>
                     <input type = "text" id = "BFT_INPUT">
+                    <input type = "button" id = "submit" value = "Submit" onclick = "submitBFT()">
                   </div>
                   
                   <div id="SCHEDULE" class="tabcontent">
@@ -118,10 +189,11 @@ input[type=text], select {
                             <!-- <td><input type = "button" id = "delete" value = "Delete this row" onclick = "deleteRow(this)"></td> -->
                             <td><input type = "button" id = "add" value = "Add another row" onclick = "insertRow(deleteRow)"></td>
                         </tr>
+                        <input type = "button" id = "submit" value = "Submit" onclick = "submitSCHEDULE()">
+
                     </table>
                   </div>
             <script type = "text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs&libraries=places"></script>
-
             <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
             <script>
                 document.getElementById("defaultOpen").click();
@@ -155,6 +227,7 @@ input[type=text], select {
                     
                 }
 
+                
                 function updateRowDelIndexes(row) {
 
                     for (var i = row; i < del_rows.length; i++) {
