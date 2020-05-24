@@ -2,11 +2,8 @@ import requests
 import json
 from flask_restful import Resource, reqparse
 import multiprocessing
-<<<<<<< Updated upstream
 import data.bestTime as bestTime
-=======
 from data.bestTime import bestTime
->>>>>>> Stashed changes
 
 class bestPlace(Resource):
     def __init__(self, api_handler):
