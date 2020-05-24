@@ -15,8 +15,8 @@ from flask_restful import Resource, reqparse
 import data.busy_times.reporter as time_reporter
 
 class bestTime(Resource):
-    def __init__(self):
-        #self.apiHandler = api_handler #TODO Readd this to init
+    def __init__(self, api_handler):
+        self.apiHandler = api_handler #TODO Readd this to init
         self.id = ""
 
     def get(self, request):
@@ -42,8 +42,9 @@ class bestTime(Resource):
             print(response)
             print(len(parsed["results"]))
             return parsed
-
-    def get_best_time(self, location, day, test_list = None):
+    
+    @staticmethod
+    def get_best_time(location, day, test_list = None):
         '''
         string(google places API placeid), string(name of day), (optional) 0-100 ratio int list -> (hour, ratio) list
         Returns a sorted list of times to visit a given location, with times of lowest relative population sorted first.
