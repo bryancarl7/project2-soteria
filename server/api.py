@@ -5,10 +5,10 @@ from data.scheduler import scheduler
 from flask import Flask, request, abort, render_template
 from flask_restful import Resource, Api
 
-#############################################
-# Written by: Bryan Carl May 15, 2020
-# Group 2: Project Soteria
-#############################################
+#########################################
+# Written by: Bryan Carl May 15, 2020   #
+# Group 2: Project Soteria              #
+#########################################
 
 # Some environment vars, don't mind me
 ENV = 'develop'
@@ -22,7 +22,7 @@ api = Api(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("soteria.html")
 
 
 @app.route("/scheduler")
@@ -35,6 +35,7 @@ def times():
     return render_template("times.html")
 
 
+# added the api resources to the appropiate
 api.add_resource(bestTime, "/times/bestTime")
 api.add_resource(bestPlace, "/times/bestPlace")
 api.add_resource(scheduler, "/scheduler/update")

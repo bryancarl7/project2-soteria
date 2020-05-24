@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <title>Soteria</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/soteria.css') }}">
+    <script type = "text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs&libraries=places"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='js/soteria.js')}}"></script>
+    <body>
+        <h1>SOTERIA</h1>
+        <div class="tab">
+            <button class="tablinks" onclick="displayMode(event, 'BST')" id="defaultOpen">Best Single Time</button>
+            <button class="tablinks" onclick="displayMode(event, 'BFT')">Best For Type</button>
+            <button class="tablinks" onclick="displayMode(event, 'SCHEDULE')">Schedule</button>
+        </div>
+        <div id="BST" class="tabcontent">
+            <h3>Best Single Time</h3>
+                <p>Instructions</p>
+                    <li>1. Enter a specific place you'd like to go (e.g. specific restaurant, store, public park)</li>
+                    <li>2. Click 'Submit' to see popular times</li>
+            <input type = "text" id = "BST_INPUT">
+            <input type = "button" id = "submit" value = "Submit" onclick = "submitBST()">
+        </div>
+                  
+        <div id="BFT" class="tabcontent">
+            <h3>Best For Type</h3>
+                <p>Instructions</p>
+                    <li>1. Enter a type of place you plan on going to (e.g. restaurant, breakfast place, golf store)</li>
+                    <li>2. Click Submit</li>
+            <input type = "text" id = "BFT_INPUT">
+            <input type = "button" id = "submit" value = "Submit" onclick = "submitBFT()">
+        </div>
+                  
+        <div id="SCHEDULE" class="tabcontent">
+            <h3>Schedule</h3>
+                <p>Scheduler</p>
+                    <table id = "schedule-table" width = "400px">
+                        <tr>
+                            <td><input type = "text" id = "SCHEDULE_INPUT"></td>
+                            <td><label for = "from">From: </label></td>
+                            <td>  
+                                    <input type="time" id="from" name="appt"
+                                    min="09:00" max="18:00" required>
+                            </td>
+                            <td><label for = "to">To: </label></td>
+                            <td>  
+                                    <input type="time" id="to" name="appt"
+                                    min="09:00" max="18:00" required>
+                            </td>
+                            <!-- <td><input type = "button" id = "delete" value = "Delete this row" onclick = "deleteRow(this)"></td> -->
+                            <td><input type = "button" id = "add" value = "Add another row" onclick = "insertRow(deleteRow)"></td>
+                        </tr>
+                        <input type = "button" id = "submit" value = "Submit" onclick = "submitSCHEDULE()">
+
+                    </table>
+        </div>
+        <script>
+            document.getElementById("defaultOpen").click();
+        </script>
+</body>
+</html>

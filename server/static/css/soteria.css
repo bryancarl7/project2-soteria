@@ -1,0 +1,134 @@
+.tab {
+  float: left;
+  border: 1px solid red;
+  background-color: lightblue;
+  width: 20%;
+  height: 201px;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  display: block;
+  background-color: lightblue;
+  color: black;
+  padding: 22px 16px;
+  width: 100%;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 20px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current "tab button" class */
+.tab button.active {
+  background-color: lightcoral;
+}
+
+/* Style the tab content */
+.tabcontent {
+  float: left;
+  padding: 0px 12px;
+  /* border: 1px solid red; */
+  width: 70%;
+  border-left: none;
+  height: 300px;
+  text-align: center;
+}
+body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif;}
+body, html {
+    height: 100%;
+    color: black;
+    line-height: 1.8;
+    background-color: lightblue;
+}
+#SCHEDULE_INPUT {
+    width: 300px;
+}
+label {
+    font-weight: 1000;
+    font-size: medium;
+}
+h1 {
+    text-align: left;
+    padding: 22px 16px;
+}
+input[type=text], select {
+	width: 100%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	display: inline-block;
+	border: 1px solid black;
+	border-radius: 4px;
+	box-sizing: border-box;
+	background: lightblue;
+	color: black;
+    font-size: 20px;
+}
+
+input[type=button] {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+input[type=button]:hover {
+    background-color: darkolivegreen;
+}
+/* reference : https://stackoverflow.com/questions/53544872/how-to-style-the-input-type-time/56959849 */
+input[type=time] {
+    border: none;
+    color: #2a2c2d;
+    font-size: 14px;
+    font-family: helvetica;
+    font-weight: bold;
+    width: 180px;
+    background-color: lightblue
+}
+input[type=time]::-webkit-datetime-edit-text {
+padding: 19px 4px;
+}
+
+input[type=time]::-webkit-clear-button {
+  display: none;
+}
+
+/* Up/Down arrows for incrementing/decrementing the value */
+input[type=time]::-webkit-inner-spin-button {
+  display: none;
+}
+/* The naming convention for the hour, minute, second, and am/pm field is
+`-webkit-datetime-edit-{field}-field` */
+
+/* Hour */
+input[type=time]::-webkit-datetime-edit-hour-field {
+  background-color: lightblue;
+  border-radius: 15%;
+  padding: 19px 13px;
+}
+
+/* Minute */
+input[type=time]::-webkit-datetime-edit-minute-field {
+  background-color: lightblue;
+  border-radius: 15%;
+  padding: 19px 13px;
+}
+
+/* AM/PM */
+input[type=time]::-webkit-datetime-edit-ampm-field {
+  background-color: #7155d3;
+  border-radius: 15%;
+  color: #fff;
+  padding: 10px 13px;
+}
