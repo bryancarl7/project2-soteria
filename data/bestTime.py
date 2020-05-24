@@ -66,7 +66,7 @@ class bestTime(Resource):
             result = reporter.get_busy_times(location, 1) #TODO: some sort of global or local var for busytimes mode selection
             times = result[day] #get the info, and then strip out what we need
         
-        outlist = sorted(zip(hours, times), key=lambda pair: pair[1])
+        outlist = sorted(zip(hours, times), key=lambda pair: 1000 if pair[1] == 0 else pair[1] )
         return outlist
 
 
