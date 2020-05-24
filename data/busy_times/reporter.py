@@ -108,7 +108,7 @@ class BusyTimesReporter():
             raise TypeError("argument 'mode' must be of type int or BusyTimesReporter.Mode")
         if isinstance(mode, int) and not cls.Mode.has_value(mode):
             raise ValueError("argument 'mode' is invalid")
-        if not isinstance(location, string):
+        if not isinstance(location, str):
             raise TypeError("argument 'location' must be of type str")
 
         # Standardize input
@@ -136,8 +136,8 @@ class BusyTimesReporter():
 
             # Fetch data from 'populartimes'
             try:
-                result = populartimes.get_id(key, location)
-            except populartime.crawler.PopulartimesException:
+                result = populartimes.get_id(API_KEY, location)
+            except populartimes.crawler.PopulartimesException:
                 raise SystemError("package 'populartimes' internally failed")
 
             # Validate web crawler data from 'populartimes'
@@ -170,7 +170,10 @@ class BusyTimesReporter():
                 busy_times[entry["name"]] = entry["data"]
         else:
             # TODO: Determine Location Type and Pass to simulation manager
+            """
             location_type = "temporary"
             busy_times = SimulationManager.get_busy_times(location_type)
+            """
+            pass
 
         return busy_times

@@ -1,7 +1,8 @@
 import requests
 import json
 from flask_restful import Resource, reqparse
-
+import multiprocessing
+import data.bestTime as bestTime
 
 class bestPlace(Resource):
     def __init__(self, api_handler):
@@ -31,3 +32,10 @@ class bestPlace(Resource):
             print(response)
             print(len(parsed["results"]))
             return parsed
+
+    def get_best_place(self, locations, day, test_dict = None):
+        '''
+        list, string, dict(location: popularity) -> dict(location: (hour, popularity))
+        Given a list of google maps placeid's and the day of the week, returns a dictionary of best times.
+        '''
+        pass
