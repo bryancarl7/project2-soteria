@@ -131,3 +131,5 @@ dmypy.json
 .pyre/
 
 credentials.ini
+*.code-workspace
+.vscode/
