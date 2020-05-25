@@ -63,8 +63,7 @@ class bestPlace(Resource):
 
         with multiprocessing.Pool() as p:
             p.starmap(bestPlace.place_helper, arglist)
-        print(str(proxdict))
-        print("after copying:")
+
         result = proxdict.copy() #managers aren't cleaned up at scope exit, so we have to copy this here.
         manager.shutdown()
 
