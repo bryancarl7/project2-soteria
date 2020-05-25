@@ -199,7 +199,9 @@ class scheduler(Resource):
             print(str(curr_locations))
             print("")
             #priority has changed, try to add previous to schedule.
-            test_subset = {x:test_dict[x] for x in curr_locations}
+            test_subset = None
+            if test_dict != None:
+                test_subset = {x:test_dict[x] for x in curr_locations}
             closedlist, glist = cls.build_greedy_list(curr_locations, day, test_subset)
             successful_inserts = []
             for (location, hour, popularity) in glist:
