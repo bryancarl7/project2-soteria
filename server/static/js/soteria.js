@@ -240,7 +240,7 @@ function initialize() {
     jQuery(document).ready(function ($) {
     $(function() {
         var auto_bst;
-        var auto_bft;
+        // var auto_bft;
         var auto_schedule;
         var bst_input = $("#BST_INPUT")[0];
         // var bft_input = $("#BFT_INPUT")[0];
@@ -250,7 +250,7 @@ function initialize() {
         // auto_bft = new google.maps.places.Autocomplete(bft_input);
         auto_schedule = new google.maps.places.Autocomplete(schedule_input);
         auto_bst.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
-        auto_bft.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
+        // auto_bft.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
         auto_schedule.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
 
         // auto_bst listener
@@ -310,7 +310,6 @@ function initialize() {
             ].join(' ');
         }
         // add the element to auto_row dictionary
-        auto_rows[0] = place;
         console.log(address);
         console.log(place);
         places[0] = place;
