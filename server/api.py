@@ -1,9 +1,8 @@
-from data.apiHandler import apiHandler
 from data.bestTime import bestTime
 from data.bestPlace import bestPlace
 from data.scheduler import scheduler
-from flask import Flask, request, abort, render_template
-from flask_restful import Resource, Api
+from flask import Flask, render_template
+from flask_restful import Api
 
 #########################################
 # Written by: Bryan Carl May 15, 2020   #
@@ -25,14 +24,14 @@ def index():
     return render_template("soteria.html")
 
 
-@app.route("/scheduler")
-def schedule():
-    return render_template("scheduler.html")
-
-
-@app.route("/times")
-def times():
-    return render_template("times.html")
+# @app.route("/scheduler")
+# def schedule():
+#     return render_template("scheduler.html")
+#
+#
+# @app.route("/times")
+# def times():
+#     return render_template("times.html")
 
 
 # added the api resources to the appropiate
@@ -45,9 +44,6 @@ if __name__ == "__main__":
     try:
         # Attempt to run the app
         print("Hosting Flask app on Port: " + str(PORT))
-
-        # api handler will eventually need setup, disabled for consistent testing
-        # handler = apiHandler(PORT, HOST, ENV, "credentials.json")
 
         # Run the app and get the successful exit
         app.run(host=HOST, port=PORT, debug=False)

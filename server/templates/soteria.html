@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/soteria.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='css/img/favicon.ico') }}">
     <script type = "text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs&libraries=places"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script src="{{url_for('static', filename='js/soteria.js')}}"></script>
@@ -55,9 +56,9 @@
                             <td><input type = "button" id = "add" value = "Add another row" onclick = "insertRow(deleteRow)"></td>
                         </tr>
                         <input type = "button" id = "submit" value = "Submit" onclick = "submitSCHEDULE()">
-
                     </table>
         </div>
+<<<<<<< HEAD
         <div id = "BST_OUTPUT">
                 <h1 id = "bst_output"></h1>
               </div>
@@ -69,8 +70,23 @@
                 <h2 id = "schedule_output"></h2>
 
               </div>
+=======
+        <div class="result">
+        </div>
+>>>>>>> 6643f3ceee7e8c50ac9161147b4683025eb52072
         <script>
             document.getElementById("defaultOpen").click();
+            // var from = document.getElementById('appt')
+            // var to = document.getElementById('appt2')
+            var auto_listeners = [];
+            var auto_rows = [];
+            var current_row = 1;
+            var sched_id = 1;
+            var del_rows = [];
+            //var table = document.getElementById("schedule-table");
+            initialize();
+            var rowIndex = 1;
+            // var apptIndex = 1;
         </script>
 </body>
 </html>

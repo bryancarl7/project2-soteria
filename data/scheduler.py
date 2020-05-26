@@ -1,14 +1,15 @@
 import requests
-from data.apiHandler import apiHandler
+from data.apiHandler import apiKeyLoader
 from flask_restful import Resource
 from collections import OrderedDict
 from data.bestPlace import bestPlace
 
-PADDING = 10 #
+PADDING = 10
 '''if we try to insert into an hour with <PADDING minutes left and need to
     add remaining time to the next, we instead ignore it. Mostly for elegance: 
     stops situations where you get a schedule of "go to location from 10:58 to 11:43".
 '''
+
 
 class hour(object):
     def __init__(self, id):
@@ -21,10 +22,10 @@ class hour(object):
 
     def insert(self, location, time):
         # Check if we have space for an event at this hour, and inserts if available.
-        if((self.timeleft - time) < 0 ):
+        if (self.timeleft - time) < 0:
             print("false")
             return False
-        if(len (self.locations) == 0):
+        if len(self.locations) == 0:
             last_time = 0
         else:
             last_time = self.locations[-1][2] 
@@ -36,7 +37,7 @@ class hour(object):
     def adjust_insert(self, location, time):
         # as insert, but inserts at the start of the hour instead of the end.
         # used for events that rollover hours.
-        if ((self.timeleft - time) < 0):
+        if (self.timeleft - time) < 0:
             ''' shifting would result in pushing an event out of this list, say no
              potential TODO: Return list of events pushed out for rescheduling? Probably not, since pushed out groups have
              a higher priority than the inserted group.'''
@@ -45,7 +46,7 @@ class hour(object):
         print("Before adjustions: ")
         print(self.locations)
         for triplet in self.locations:
-            #shift every location up
+            # Shift every location up
             triplet[1] += time
             triplet[2] += time
         self.locations.insert(0, [location, 0, time])
@@ -54,14 +55,14 @@ class hour(object):
         return True
  
     def __str__(self):
-        if(self.id > 12):
+        if self.id > 12:
             hour = self.id - 12
             ending = "pm"
         else:
             hour = self.id
             ending = "am"
         out = ("For {} {}, ".format(hour, ending))
-        if(len(self.locations) > 0):
+        if len(self.locations) > 0:
             things = []
             for tup in self.locations:
                 end_hour = hour
@@ -69,13 +70,15 @@ class hour(object):
                 if tup[2] == 60:
                     minutes = 0
                     end_hour += 1
-                    if(end_hour == 24):
+                    if end_hour == 24:
                         end_hour = 0
-                things.append("at {0} from {1}:{2} - {3}:{4} {5}".format(tup[0], hour, str(tup[1]).zfill(2), end_hour, str(minutes).zfill(2), ending))
+                things.append("at {0} from {1}:{2} - {3}:{4} {5}".format(tup[0], hour, str(tup[1]).zfill(2), end_hour,
+                                                                         str(minutes).zfill(2), ending))
             out += "there are events: " + ",".join(things)
         else:
             out += "there is nothing scheduled"
         return out
+
 
 class scheduleObj(object):
     '''
@@ -89,20 +92,19 @@ class scheduleObj(object):
             self.hours[x] = hour(x)
 
     def insert(self, location, hour, time, closedtimes):
-        print("attempting insert of place " + location + " at hour " + str(hour) + " with duration " + str(time), end = '.')
+        print("attempting insert of place " + location + " at hour " + str(hour) + " with duration " + str(time), end='.')
         hourobj = self.hours[hour]
-        if(self.strict):
+        if self.strict:
             return hourobj.insert(location, time)
         else:
-            if(hourobj.insert(location, time)):
+            if hourobj.insert(location, time):
                 # same logic as strict: If we can fully insert now, do so
                 return True
             if hourobj.timeleft <= PADDING:
                 print("padding killed it")
                 return False
-            if (self.recursive_insert(location, hour+1, ( time - hourobj.timeleft), closedtimes) ):
+            if self.recursive_insert(location, hour+1, ( time - hourobj.timeleft), closedtimes):
                 return hourobj.insert(location, hourobj.timeleft)
-
 
     def recursive_insert(self, location, hour, time, closedtimes):
         hourobj = self.hours[hour]
@@ -111,24 +113,25 @@ class scheduleObj(object):
             print(location + " is closed at " + str(hour))
             return False
         if time <= hourobj.timeleft:
-            #try insertion. *should* work.
+            # try insertion. *should* work.
             return hourobj.adjust_insert(location, time)
-        if (hourobj.timeleft == 60 and hour <23):
-            # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour. Does not allow for schedules spanning two days.
-            if (self.recursive_insert(location, hour+1, time-60, closedtimes)):
+        if hourobj.timeleft == 60 and hour < 23:
+            # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
+            # Does not allow for schedules spanning two days.
+            if self.recursive_insert(location, hour+1, time-60, closedtimes):
                 # we were able to insert into later time slots; now, insert ourselves fully into this slot.
                 return hourobj.insert(location, 60)
-
 
     def __str__(self):
         slist = []
         for x in range(24):
             slist.append(str(self.hours[x]))
-        return('\n'.join(slist))
+        return '\n'.join(slist)
+
 
 class scheduler(Resource):
-    def __init__(self, api_handler):
-        self.apiHandler = api_handler
+    def __init__(self):
+        self.apiHandler = apiKeyLoader()
         self.id = ""
         self.table = []
 
@@ -194,36 +197,35 @@ class scheduler(Resource):
                 curr_times[key] = time
                 continue
 
-
             print("stepping into allocations with list: ")
             print(str(curr_locations))
             print("")
-            #priority has changed, try to add previous to schedule.
+            # Priority has changed, try to add previous to schedule.
             test_subset = None
-            if test_dict != None:
+            if test_dict is not None:
                 test_subset = {x:test_dict[x] for x in curr_locations}
             closedlist, glist = cls.build_greedy_list(curr_locations, day, test_subset)
             successful_inserts = []
             for (location, hour, popularity) in glist:
-                if(popularity == 0):
-                    # location is closed
+                if popularity == 0:
+                    # Location is closed
                     continue
                 if len(successful_inserts) == len(curr_locations):
-                    # we've allocated everything, get out of the loop!
+                    # We've allocated everything, get out of the loop!
                     break
                 if location in successful_inserts:
-                    # this location already exists in the schedule; ignore it.
+                    # This location already exists in the schedule; ignore it.
                     continue
                 
                 if sched.insert(location, hour, curr_times[location], closedlist[location]):
                     successful_inserts.append(location)
                     print(successful_inserts)
             
-            #Check if we inserted everything in this priority level
+            # Check if we inserted everything in this priority level
             if len(successful_inserts) != len(curr_locations):
-                raise Exception #todo: better error descriptor
+                raise Exception  # TODO: better error descriptor
 
-            #previous priority has been handled, setup new priority
+            # Previous priority has been handled, setup new priority
             curr_priority = priority
             curr_locations = [key] 
             curr_times = {key: time}
