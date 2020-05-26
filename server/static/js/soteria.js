@@ -1,10 +1,3 @@
-var auto_listeners = [];
-var auto_rows = [];
-var current_row = 1;
-var sched_id = 1;
-var del_rows = [];
-var places = {};
-var bst_place;
 
 function deleteRow() {
     var table = document.getElementById("schedule-table");
