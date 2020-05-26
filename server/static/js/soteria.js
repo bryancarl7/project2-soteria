@@ -1,4 +1,3 @@
-
 function deleteRow() {
     var table = document.getElementById("schedule-table");
     let name = this.name;
@@ -9,10 +8,6 @@ function deleteRow() {
     updateRowDelIndexes(row-1);
     current_row -= 1;
 
-    // var i = row.parentNode.parentNode.rowindex;
-    // console.log(i);
-    // console.log(row.parentNode.parentNode)
-    // table.deleteRow(i-1);
 }
 
 
@@ -119,57 +114,62 @@ function insertRow(delete_function) {
     // initialize();
 
     var table = document.getElementById("schedule-table");
-    var valid_times = checkTimesValidity();
-    var valid_entries = checkEntriesValidity();
-    if(valid_times && valid_entries) {
-    var row = table.insertRow(-1)
-    var cell = row.insertCell(0);
-    var t1 = document.createElement("input");
-    t1.id = "SCHEDULE_INPUT" + sched_id;
-    t1.type = "text";
-    cell.appendChild(t1);
-    addAutoRow();
+    let valid_times = checkTimesValidity();
+    if (valid_times) {
+    let valid_entries = checkEntriesValidity();
+        if (valid_entries) {
+            var row = table.insertRow(-1)
+            var cell = row.insertCell(0);
+            var t1 = document.createElement("input");
+            t1.id = "SCHEDULE_INPUT" + sched_id;
+            t1.type = "text";
+            cell.appendChild(t1);
+            addAutoRow();
 
-    var cell2 = row.insertCell(1);
-    var from = document.createElement("label");
-    from.htmlFor = "from" + current_row;
-    from.innerHTML = "From: ";
-    cell2.appendChild(from);
+            var cell2 = row.insertCell(1);
+            var from = document.createElement("label");
+            from.htmlFor = "from" + current_row;
+            from.innerHTML = "From: ";
+            cell2.appendChild(from);
 
-    var cell3 = row.insertCell(2);
-    var appt_from = document.createElement("input");
-    appt_from.id = "from" + current_row;
-    appt_from.type = "time";
-    appt_from.min = "09:00";
-    appt_from.max = "18:00";
-    cell3.appendChild(appt_from);
+            var cell3 = row.insertCell(2);
+            var appt_from = document.createElement("input");
+            appt_from.id = "from" + current_row;
+            appt_from.type = "time";
+            appt_from.min = "09:00";
+            appt_from.max = "18:00";
+            cell3.appendChild(appt_from);
 
-    var cell4 = row.insertCell(3);
-    var to = document.createElement("label");
-    to.htmlFor = "to" + current_row;
-    to.innerHTML = "To: ";
-    cell4.appendChild(to);
+            var cell4 = row.insertCell(3);
+            var to = document.createElement("label");
+            to.htmlFor = "to" + current_row;
+            to.innerHTML = "To: ";
+            cell4.appendChild(to);
 
-    var cell5 = row.insertCell(4);
-    var appt_to = document.createElement("input");
-    appt_to.id = "to" + current_row;
-    appt_to.type = "time";
-    appt_to.min = "09:00";
-    appt_to.max = "18:00";
-    cell5.appendChild(appt_to);
+            var cell5 = row.insertCell(4);
+            var appt_to = document.createElement("input");
+            appt_to.id = "to" + current_row;
+            appt_to.type = "time";
+            appt_to.min = "09:00";
+            appt_to.max = "18:00";
+            cell5.appendChild(appt_to);
 
-    var cell5 = row.insertCell(5);
-    var del = document.createElement("input");
-    del.type = "button";
-    del.id = "delete";
-    del.name = "row" + current_row;
-    del.value = "Delete this row";
-    del.onclick = delete_function;
-    cell5.appendChild(del);
-    del_rows.push(del);
+            var cell5 = row.insertCell(5);
+            var del = document.createElement("input");
+            del.type = "button";
+            del.id = "delete";
+            del.name = "row" + current_row;
+            del.value = "Delete this row";
+            del.onclick = delete_function;
+            cell5.appendChild(del);
+            del_rows.push(del);
 
-    current_row += 1;
-    sched_id += 1;
+            current_row += 1;
+            sched_id += 1;
+
+
+        }
+
     }
 }
 
@@ -319,16 +319,14 @@ function initialize() {
     })
 }
 
-function submitBST(){
+function submitBST(displayOutput){
     let BST = document.getElementById("BST_INPUT");
 
-    
     console.log(BST.value);
     if (BST.value == "") {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
       }
       console.log(bst_place);
-
 
     let lat;
     let long;
@@ -344,12 +342,21 @@ function submitBST(){
             "longitude" : long,
             "text" : BST.value
         }
+        let output = document.getElementById("BST_OUTPUT");
 
         console.log(payload);
 
-        $.post( "/times/bestTime", payload, function( data ) {
-            $( ".result" ).html( data );
-        });
+        $.ajax({
+            url: "/times/bestTime",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success:function(data) {
+
+                // retrieve data here
+                console.log(data);
+            }
+        })
     });
 }
 
