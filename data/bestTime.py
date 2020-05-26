@@ -1,23 +1,31 @@
 """
 bestTime.py
 ===============================================================================
-Last Modified: 22 May 2020
-Modification By: Morgan Edlund
+Last Modified: 25 May 2020
+Modification By: Bryan Carl
 Creation Date: 22 May 2020
 Initial Author: Bryan Carl
 ===============================================================================
-
-
 """
 import requests
 import json
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, request
 import data.busy_times.reporter as time_reporter
+from data.apiHandler import apiKeyLoader
+
 
 class bestTime(Resource):
-    def __init__(self, api_handler):
-        self.apiHandler = api_handler #TODO Readd this to init
-        self.id = ""
+    def __init__(self):
+        self.apiHandler = apiKeyLoader()
+        self.req_parser = reqparse.RequestParser()
+        self.req_parser.add_argument('latitude', type=float)
+        self.req_parser.add_argument('longitude', type=float)
+        self.req_parser.add_argument('text', type=str)
+
+    def post(self):
+        args = self.req_parser.parse_args(request)
+        print(args)
+        return '', 200
 
     def get(self, request):
         r = reqparse.RequestParser(request)

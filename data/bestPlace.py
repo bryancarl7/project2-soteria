@@ -1,27 +1,35 @@
 import requests
 import json
-from flask_restful import Resource, reqparse
+from data.apiHandler import apiKeyLoader
+from flask_restful import Resource, reqparse, request
 import multiprocessing
 import data.bestTime as bestTime
 from data.bestTime import bestTime
 
+
 class bestPlace(Resource):
-    def __init__(self, api_handler):
-        self.apiHandler = api_handler
-        self.id = ""
+    def __init__(self):
+        self.apiHandler = apiKeyLoader()
+        self.req_parser = reqparse.RequestParser()
+        self.req_parser.add_argument('latitude', type=float)
+        self.req_parser.add_argument('longitude', type=float)
+        self.req_parser.add_argument('text', type=str)
 
     def get(self, request):
         r = reqparse.RequestParser(request)
         return r, 200
 
+    def add_api_arg(self):
+        return "&key=" + self.apiHandler.get_api_key()
+
     def make_request(self, **kwargs):
         # load up our parameters
-        package = "location=44.0448,-123.0726&radius=500&type=restaurant" + \
-                  "&key=" + self.api
+        package = "location=44.0448,-123.0726&radius=500&type=restaurant"+self.add_api_arg()
 
         # map out our url to be loaded
         new_request_url = ("https://maps.googleapis.com/maps/api/" +
                            "place/nearbysearch/json?{}".format(package))
+
         print(new_request_url)
 
         # open the url as a response to be read from

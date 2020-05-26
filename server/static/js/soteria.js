@@ -1,16 +1,3 @@
-document.getElementById("defaultOpen").click();
-// var from = document.getElementById('appt')
-// var to = document.getElementById('appt2')
-var auto_listeners = [];
-var auto_rows = [];
-var current_row = 1;
-var sched_id = 1;
-var del_rows = [];
-//var table = document.getElementById("schedule-table");
-initialize();
-var rowIndex = 1;
-// var apptIndex = 1;
-
 function deleteRow() {
     var table = document.getElementById("schedule-table");
     let name = this.name;
@@ -19,23 +6,18 @@ function deleteRow() {
     del_rows.splice(row-1, 1);
 
     updateRowDelIndexes(row-1);
-
     current_row -= 1;
 
     // var i = row.parentNode.parentNode.rowindex;
     // console.log(i);
     // console.log(row.parentNode.parentNode)
     // table.deleteRow(i-1);
-
 }
 
 
 function updateRowDelIndexes(row) {
-
     for (var i = row; i < del_rows.length; i++) {
-
         del_rows[i].name = "row" + (i+1);
-
     }
     removeAutoRow(row);
 }
@@ -149,10 +131,7 @@ function removeAutoRow(del_row) {
             auto_listeners.splice(del_row, 1);
             auto_rows.splice(del_row, 1);
         })
-
     })
-
-
 }
 
 
@@ -162,7 +141,6 @@ function addAutoRow() {
         console.log("currently here");
 
         $(function() {
-
             var new_auto_row;
             var new_sched_input = $("#SCHEDULE_INPUT" + sched_id)[0];
             auto_rows[current_row-1] = new google.maps.places.Autocomplete(new_sched_input);
@@ -170,16 +148,16 @@ function addAutoRow() {
             auto_listeners[current_row-1] = auto_rows[current_row-1].addListener('place_changed', function() {
             var place = this.getPlace();
             if (!place.geometry) {
-            window.alert("No details available for input: '" + place.name + "'");
-            return;
+                window.alert("No details available for input: '" + place.name + "'");
+                return;
             }
             var address = '';
             if (place.address_components) {
-            address = [
-            (place.address_components[0] && place.address_components[0].short_name || ''),
-            (place.address_components[1] && place.address_components[1].short_name || ''),
-            (place.address_components[2] && place.address_components[2].short_name || '')
-            ].join(' ');
+                address = [
+                    (place.address_components[0] && place.address_components[0].short_name || ''),
+                    (place.address_components[1] && place.address_components[1].short_name || ''),
+                    (place.address_components[2] && place.address_components[2].short_name || '')
+                ].join(' ');
             }
             console.log(address);
             console.log(place);
@@ -211,17 +189,17 @@ function initialize() {
         auto_bst.addListener('place_changed', function() {
         var place = this.getPlace();
         if (!place.geometry) {
-        window.alert("No details available for input: '" + place.name + "'");
-        return;
+            window.alert("No details available for input: '" + place.name + "'");
+            return;
         }
         var address = '';
         if (place.address_components) {
-        address = [
-            (place.address_components[0] && place.address_components[0].short_name || ''),
-            (place.address_components[1] && place.address_components[1].short_name || ''),
-            (place.address_components[2] && place.address_components[2].short_name || '')
-        ].join(' ');
-        }
+            address = [
+                (place.address_components[0] && place.address_components[0].short_name || ''),
+                (place.address_components[1] && place.address_components[1].short_name || ''),
+                (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
+            }
         console.log(address);
         console.log(place);
         });
@@ -230,16 +208,16 @@ function initialize() {
         auto_bft.addListener('place_changed', function() {
         var place = this.getPlace();
         if (!place.geometry) {
-        window.alert("No details available for input: '" + place.name + "'");
-        return;
+            window.alert("No details available for input: '" + place.name + "'");
+            return;
         }
         var address = '';
         if (place.address_components) {
-        address = [
-            (place.address_components[0] && place.address_components[0].short_name || ''),
-            (place.address_components[1] && place.address_components[1].short_name || ''),
-            (place.address_components[2] && place.address_components[2].short_name || '')
-        ].join(' ');
+            address = [
+                (place.address_components[0] && place.address_components[0].short_name || ''),
+                (place.address_components[1] && place.address_components[1].short_name || ''),
+                (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
         }
         console.log(address);
         console.log(place);
@@ -249,24 +227,62 @@ function initialize() {
         auto_schedule.addListener('place_changed', function() {
         var place = this.getPlace();
         if (!place.geometry) {
-        window.alert("No details available for input: '" + place.name + "'");
-        return;
+            window.alert("No details available for input: '" + place.name + "'");
+            return;
         }
         var address = '';
         if (place.address_components) {
-        address = [
-            (place.address_components[0] && place.address_components[0].short_name || ''),
-            (place.address_components[1] && place.address_components[1].short_name || ''),
-            (place.address_components[2] && place.address_components[2].short_name || '')
-        ].join(' ');
+            address = [
+                (place.address_components[0] && place.address_components[0].short_name || ''),
+                (place.address_components[1] && place.address_components[1].short_name || ''),
+                (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
         }
         // add the element to auto_row dictionary
         auto_rows[0] = place;
         console.log(address);
         console.log(place);
         });
-
     })
     })
 }
 
+function submitBST(){
+    let BST = document.getElementById("BST_INPUT");
+    let Schedule = document.getElementById("schedule-table");
+    console.log(BST.value);
+
+    let lat;
+    let long;
+
+    navigator.geolocation.getCurrentPosition(function f(args){
+        console.log("Args: " + args);
+        console.log("Arg Obj: " + Object.keys(args))
+        lat = args.latitude
+        long = args.longitude
+
+        payload = {
+            "latitude" : lat,
+            "longitude" : long,
+            "text" : BST.value
+        }
+
+        console.log(payload);
+
+        $.post( "/times/bestTime", payload, function( data ) {
+            $( ".result" ).html( data );
+        });
+    });
+}
+
+function submitBFT(){
+    // TODO
+    let BFT = document.getElementById("BFT_INPUT");
+    console.log(BFT.value)
+}
+
+function submitSCHEDULE(){
+    // TODO
+    let Schedule = document.getElementById("schedule-table");
+    console.log(Schedule.value);
+}
