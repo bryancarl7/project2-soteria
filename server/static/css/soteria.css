@@ -55,6 +55,9 @@ label {
     font-weight: 1000;
     font-size: medium;
 }
+div {
+  position: relative;
+}
 h1 {
     text-align: left;
     padding: 22px 16px;
