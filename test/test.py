@@ -3,8 +3,8 @@ test.py
 
 ===============================================================================
 
-Last Modified: 23 May 2020
-Modification By: Carter Perkins
+Last Modified: 26 May 2020
+Modification By: Jinhu Qi
 
 Creation Date: 15 May 2020
 Initial Author: Bryan Carl
@@ -18,15 +18,19 @@ of this, it interfaces with every single module.
 # Standard Imports
 import time
 import unittest
+from unittest import mock
 
 # Third Party Packages
 import requests
 
 # Local Modules
+
 from data.busy_times.reporter import BusyTimesReporter
 from data.busy_times.manager import SimulationManager
-from server.api import app, PORT, ENV, HOST, apiHandler
-
+from server.api import app, PORT, ENV, HOST
+from data.bestTime import bestTime
+from data.bestPlace import bestPlace
+from flask_restful import request
 class ServerTests(unittest.TestCase):
 
     def test_server_pages(self):
@@ -43,6 +47,7 @@ class ServerTests(unittest.TestCase):
                 print(f"\tChecking route {route}")
                 response = client.get(route)
                 self.assertEqual(response.status_code, 200)
+
 
     def test_server_resources(self):
         """
@@ -61,40 +66,8 @@ class ServerTests(unittest.TestCase):
 # Need to discuss:
 # TODO: use unittest.mock when using requests OR Flask app.test_client()
 
-class BusyTimesReporterTests(unittest.TestCase):
-    pass
 
 class SimulationManagerTests(unittest.TestCase):
-    """
-    def test_bestTime(self):
-        bT = bestTime(apiHandler)
-        parsed = bT.make_request()
-        self.assertIsNotNone(parsed)
-
-    def test_bestPlace(self):
-        bP = bestPlace(apiHandler)
-        parsed = bP.make_request()
-        self.assertIsNotNone(parsed)
-    @classmethod
-    def test_apiBestPlace(cls):
-        response_place = requests.get("http://0.0.0.0:3000/times/bestPlace")
-        assert(response_place.status_code, 200)
-        print("best place page successfully created")
-
-
-    @classmethod
-    def test_apiBestTime(cls):
-        response_time = requests.get("http://0.0.0.0:3000/times/bestTime")
-        assert(response_time.status_code, 200)
-        print("best time page successfully created")
-
-
-    @classmethod
-    def test_apiBestScheduler(cls):
-        response_scheduler = requests.get("http://0.0.0.0:3000/scheduler/update")
-        assert(response_scheduler.status_code, 200)
-        print("scheduler page successfully created")
-    """
 
     def test_simulated_data(self):
         """
@@ -171,6 +144,73 @@ class SimulationManagerTests(unittest.TestCase):
             observed = SimulationManager.get_busy_times(case)
             expected = expected_results[cases.index(case)]
             self.assertEqual(observed, expected)
+
+class BusyTimesReporterTests(unittest.TestCase):
+
+    def test_get_api_key(self):
+        print()
+        print("=" * 80)
+        print("Testing the functionality of reporter API")
+        result = BusyTimesReporter.get_api_key()
+        self.assertIsNotNone(result)
+
+    def test_get_busy_times(self):
+        modeType = [0, 1] # simulated, accurate
+        locations = ["park", "store", "supermarket", "restaurant"]
+        for location in locations:
+            for mode in modeType:
+                print("Checking for location:", location, ", mode type:", mode)
+                result = BusyTimesReporter.get_busy_times(location, mode)
+                self.assertIsNotNone(result)
+
+
+class BestTimeTests(unittest.TestCase):
+
+    def test_get(self):
+        print()
+        print("=" * 80)
+        print("Testing the functionality of BestTime API")
+        bt = bestTime()
+        r, code = bt.get(self, request)
+        self.assertEqual(code, 200)
+
+    def test_post(self):
+        bt = bestTime()
+        temp, code = bt.post()
+        self.assertEqual(code, 200)
+
+    def test_get_best_place(self):
+        bt = bestTime()
+        locations = ["park", "store", "supermarket", "restaurant"]
+        days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        print("For bestTime, \n")
+        for location in locations:
+            for day in days:
+                print("Checking for location:", location, ", days:", day)
+                result = bt.get_best_time(location, day)
+                self.assertIsNotNone(result)
+
+class BestPlaceTests(unittest.TestCase):
+
+    def test_get(self):
+        print()
+        print("=" * 80)
+        print("Testing the functionality of BestPlace API")
+        bp = bestPlace()
+        r, code = bp.get(self, request)
+        self.assertEqual(code, 200)
+
+    def test_get_best_place(self):
+        bp = bestPlace()
+        locations = ["park", "store", "supermarket", "restaurant"]
+        days = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        print("For bestPlace , \n")
+        for location in locations:
+            for day in days:
+                print("Checking for location:", location, ", days:", day)
+                result = bp.get_best_place(location, day)
+                self.assertIsNotNone(result)
+
 
 if __name__ == '__main__':
     unittest.main()
