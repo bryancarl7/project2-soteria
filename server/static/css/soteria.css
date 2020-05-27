@@ -1,11 +1,14 @@
-.tab {
+
+    .tab {
   float: left;
   border: 1px solid red;
   background-color: lightblue;
   width: 20%;
   height: 201px;
 }
-
+.priority {
+  padding: 3px;
+}
 /* Style the buttons inside the tab */
 .tab button {
   display: block;
@@ -48,23 +51,9 @@ body, html {
     line-height: 1.8;
     background-color: lightblue;
 }
-#SCHEDULE_INPUT {
-    width: 300px;
-}
-label {
-    font-weight: 1000;
-    font-size: medium;
-}
-div {
-  position: relative;
-}
-h1 {
-    text-align: left;
-    padding: 22px 16px;
-}
-input[type=text], select {
-	width: 100%;
-	padding: 12px 20px;
+select {
+  width: 95%;
+  padding: 20px 20px;
 	margin: 8px 0;
 	display: inline-block;
 	border: 1px solid black;
@@ -72,35 +61,63 @@ input[type=text], select {
 	box-sizing: border-box;
 	background: lightblue;
 	color: black;
-    font-size: 20px;
+	font-size: 20px;
+}
+#SCHEDULE_INPUT {
+    width: 300px;
+}
+label {
+    padding: 0px 10px;
+    font-weight: 1000;
+    font-size: medium;
+}
+h1 {
+    text-align: left;
+    padding: 22px 16px;
+}
+div {
+  position: relative;
 }
 
-input[type=button] {
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    padding: 14px 20px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+input[type=text] {
+	width: 100%;
+	padding: 20px 20px;
+	margin: 8px 0;
+	display: inline-block;
+	border: 1px solid black;
+	border-radius: 4px;
+	box-sizing: border-box;
+	background: lightblue;
+	color: black;
+	font-size: 20px;
+  }
 
-input[type=button]:hover {
-    background-color: darkolivegreen;
-}
-/* reference : https://stackoverflow.com/questions/53544872/how-to-style-the-input-type-time/56959849 */
-input[type=time] {
+  input[type=button] {
+	width: 100%;
+	background-color: #4CAF50;
+	color: white;
+	padding: 20px 20px;
+	margin: 8px 0;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+  }
+
+  input[type=button]:hover {
+	background-color: darkolivegreen;
+  }
+  /* reference : https://stackoverflow.com/questions/53544872/how-to-style-the-input-type-time/56959849 */
+  input[type=time] {
     border: none;
     color: #2a2c2d;
-    font-size: 14px;
+    font-size: 20px;
     font-family: helvetica;
     font-weight: bold;
     width: 180px;
     background-color: lightblue
-}
-input[type=time]::-webkit-datetime-edit-text {
-padding: 19px 4px;
+  }
+  input[type=time]::-webkit-datetime-edit-text {
+  padding: 19px 4px;
 }
 
 input[type=time]::-webkit-clear-button {

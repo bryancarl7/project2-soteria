@@ -108,65 +108,116 @@ function compare(a, b) {
     return true;
 
     }
+
+    function checkPriorities() {
+
+        var entry;
+        for (var i = 0; i < sched_id; i++) {
+            var entry = "priority";
+
+            if (i != 0) {
+                // update ids
+                entry += i;
+                entry_t = document.getElementById(entry);
+                if (entry_t !== null) {
+
+                    if (entry_t.value == "") {
+                    alert("ERROR: PLEASE ENTER VALID PLACES BEFORE ADDING MORE ROWS / SUBMITTING");
+                    return false;
+                }
+
+                }
+            }
+            else {
+                // take as is
+                entry_t = document.getElementById(entry);
+                if (entry_t.value == "") {
+                    alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+                    return false;
+                }
+
+            }
+
+        }
+
+        return true;
+
+        }
 // add a priority attribute to each row
 function insertRow(delete_function) {
-    // $('#schedule-table').append('<tr><td><input type = "text" id = "SCHEDULE_INPUT"/></td><td><label for = "appt">From: </label></td><td> <input type="time" id="appt" name="appt" min="09:00" max="18:00" required> </td><td><label for = "appt2">To: </label></td><td> <input type="time" id="appt2" name="appt" min="09:00" max="18:00" required></td><td><input type = "button" id = "delete" value = "Delete this row" onclick = "deleteRow(this)"></td><td><input type = "button" id = "add" value = "Add another row" onclick = "insertRow()"></td></tr>');
-    // initialize();
 
     var table = document.getElementById("schedule-table");
     let valid_times = checkTimesValidity();
     if (valid_times) {
     let valid_entries = checkEntriesValidity();
         if (valid_entries) {
+            let valid_priorities = checkPriorities();
+            if (valid_priorities) {
+
             var row = table.insertRow(-1)
             var cell = row.insertCell(0);
+            var priorities = document.createElement("select");
+            priorities.id = "priority" + current_row;
+            priorities.class = "priority";
+            for (var i = 1; i <= 5; i++) {
+            var opt = document.createElement("option");
+            var t = document.createTextNode(i.toString());
+            opt.appendChild(t);
+            priorities.appendChild(opt);
+            }
+            cell.appendChild(priorities);
+
+            var cell2 = row.insertCell(1);
             var t1 = document.createElement("input");
             t1.id = "SCHEDULE_INPUT" + sched_id;
             t1.type = "text";
-            cell.appendChild(t1);
+            cell2.appendChild(t1);
             addAutoRow();
 
-            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
             var from = document.createElement("label");
             from.htmlFor = "from" + current_row;
             from.innerHTML = "From: ";
-            cell2.appendChild(from);
+            cell3.appendChild(from);
 
-            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
             var appt_from = document.createElement("input");
             appt_from.id = "from" + current_row;
             appt_from.type = "time";
             appt_from.min = "09:00";
             appt_from.max = "18:00";
-            cell3.appendChild(appt_from);
+            cell4.appendChild(appt_from);
 
-            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
             var to = document.createElement("label");
             to.htmlFor = "to" + current_row;
             to.innerHTML = "To: ";
-            cell4.appendChild(to);
+            cell5.appendChild(to);
 
-            var cell5 = row.insertCell(4);
+            var cell6 = row.insertCell(5);
             var appt_to = document.createElement("input");
             appt_to.id = "to" + current_row;
             appt_to.type = "time";
             appt_to.min = "09:00";
             appt_to.max = "18:00";
-            cell5.appendChild(appt_to);
+            cell6.appendChild(appt_to);
 
-            var cell5 = row.insertCell(5);
+            var cell7 = row.insertCell(6);
             var del = document.createElement("input");
             del.type = "button";
             del.id = "delete";
             del.name = "row" + current_row;
             del.value = "Delete this row";
             del.onclick = delete_function;
-            cell5.appendChild(del);
+            cell7.appendChild(del);
             del_rows.push(del);
 
             current_row += 1;
             sched_id += 1;
 
+
+
+            }
 
         }
 
@@ -249,9 +300,9 @@ function initialize() {
         auto_bst = new google.maps.places.Autocomplete(bst_input);
         // auto_bft = new google.maps.places.Autocomplete(bft_input);
         auto_schedule = new google.maps.places.Autocomplete(schedule_input);
-        auto_bst.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
+        auto_bst.setFields(['address_components', 'geometry', 'icon', 'name', 'id', 'type']);
         // auto_bft.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
-        auto_schedule.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
+        auto_schedule.setFields(['address_components', 'geometry', 'icon', 'name', 'id', 'type']);
 
         // auto_bst listener
         auto_bst.addListener('place_changed', function() {
@@ -270,28 +321,8 @@ function initialize() {
             }
         console.log(address);
         console.log(place);
+        bst_place = place;
         });
-
-        /*  unneeded
-        // auto_bft listener
-        auto_bft.addListener('place_changed', function() {
-        var place = this.getPlace();
-        if (!place.geometry) {
-            window.alert("No details available for input: '" + place.name + "'");
-            return;
-        }
-        var address = '';
-        if (place.address_components) {
-            address = [
-                (place.address_components[0] && place.address_components[0].short_name || ''),
-                (place.address_components[1] && place.address_components[1].short_name || ''),
-                (place.address_components[2] && place.address_components[2].short_name || '')
-            ].join(' ');
-        }
-        console.log(address);
-        console.log(place);
-        });
-        */
 
 
         // auto_schedule listener
@@ -319,6 +350,13 @@ function initialize() {
     })
 }
 
+/* 
+scheduler output: ["place: start time:endtime"]
+bestTime [(hour, ratio)]
+bestPlace { location:(hour, ratio)}
+*/
+
+
 function submitBST(displayOutput){
     let BST = document.getElementById("BST_INPUT");
 
@@ -340,7 +378,7 @@ function submitBST(displayOutput){
         payload = {
             "latitude" : lat,
             "longitude" : long,
-            "text" : BST.value
+            "place" : bst_place
         }
         let output = document.getElementById("BST_OUTPUT");
 
@@ -351,10 +389,8 @@ function submitBST(displayOutput){
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
-            success:function(data) {
-
-                // retrieve data here
-                console.log(data);
+            success: function(data) {
+                displayOutput(data, 'BST');
             }
         })
     });
@@ -366,12 +402,78 @@ function submitBFT(){
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
     }
+        var payload = {
+            "latitude" : lat,
+            "longitude" : long,
+            "type" : entry.value
+        }
 
+        $.ajax({
+            url: "/times/bestTime",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function(data) {
+                displayOutput(data, 'BST');
+            }
+        })
     console.log(entry.value);
+}
+
+function getTimeDifference(index) {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+
+    today = mm + '/' + dd + '/' + yyyy; 
+    var to = "to";
+    var from = "from";
+    if (index != 0) {
+        to += index;
+        from += index;
+    }
+    let from_t = document.getElementById(from);
+    let to_t = document.getElementById(to);
+
+    var timeStart = new Date(today + " " + from_t.value).val();
+    var timeEnd = new Date(today + " " + to_t.value).val();
+
+    return timeEnd - timeStart;
+
 }
 
 function submitSCHEDULE(){
     // TODO
+    var index = 1;
+    var output = [];
+    for (var i = 0; i < sched_id; i++) {
+        var entry = "SCHEDULE_INPUT";
+
+        if (i != 0) {
+            // update ids
+            entry += i;
+            entry_t = document.getElementById(entry);
+            if (entry_t !== null) {
+
+                let payload = {
+                    "place" : places[index],
+                    "time" : getTimeDifference(index),
+                    "priority" : getPriority(index)
+                }
+
+            }
+        }
+        else {
+            // take as is
+            entry_t = document.getElementById(entry);
+            if (entry_t.value == "") {
+             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+             return false;
+            }
+
+        }
+    }
     console.log(places);
 
 }
