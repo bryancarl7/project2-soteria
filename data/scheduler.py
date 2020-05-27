@@ -158,11 +158,7 @@ class scheduleObj(object):
                 internal += cur[1:]
             else:
                 internal += cur
-        print(internal)
-        out = []
-        for loc, start, end in internal:
-            out.append( "{}: {}{}:{}{}".format(loc, str(start//60).zfill(2), str(start % 60).zfill(2), str(end//60).zfill(2), str(end % 60).zfill(2)))
-        return out
+        return internal
 
 
 
@@ -271,4 +267,4 @@ class scheduler(Resource):
             curr_priority = priority
             curr_locations = [key] 
             curr_times = {key: time}
-        return sched
+        return sched.to_list()
