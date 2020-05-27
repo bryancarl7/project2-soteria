@@ -16,6 +16,7 @@ class hour(object):
         self.id = id
         self.locations = []
         self.timeleft = 60
+        self.z_score = 0
         # keeps track if an event bleeds over from a prior hour to this, or from this to the hour after.
         self.hasbefore = False
         self.hasafter = False
@@ -54,6 +55,17 @@ class hour(object):
         print(self.locations)
         return True
  
+    def as_minutes(self):
+        '''
+        returns a representation where each item in location is (60*our hour)+minutes. Used for representing multi-hour events.
+        '''
+        out = []
+        offset = 60*self.id
+        for loc, start, end in self.locations:
+            out.append((loc, start+offset, end+offset))
+        return out
+
+
     def __str__(self):
         if self.id > 12:
             hour = self.id - 12
@@ -80,6 +92,7 @@ class hour(object):
         return out
 
 
+
 class scheduleObj(object):
     '''
     Schedule object, handles the logic for trying to insert a given time. 
@@ -101,7 +114,6 @@ class scheduleObj(object):
                 # same logic as strict: If we can fully insert now, do so
                 return True
             if hourobj.timeleft <= PADDING:
-                print("padding killed it")
                 return False
             if self.recursive_insert(location, hour+1, ( time - hourobj.timeleft), closedtimes):
                 return hourobj.insert(location, hourobj.timeleft)
@@ -127,6 +139,36 @@ class scheduleObj(object):
         for x in range(24):
             slist.append(str(self.hours[x]))
         return '\n'.join(slist)
+
+    def to_list(self):
+        internal = self.hours[0].as_minutes()
+        for x in range(1, 23):
+            cur = self.hours[x].as_minutes()
+            if(len(internal) == 0):
+                internal = cur
+            if(len(cur) == 0):
+                continue
+            if (internal[-1][0] == cur[0][0]):
+                '''
+                if same location, concatenate
+                so [a, 0, 60] + [a, 0, 30] => [a,0,90] which will get turned back into hours after processing.
+                This allows for multi-hour events to get correctly concatenated, whil being processible for strings
+                '''
+                internal[-1][2] += cur[0][2]
+                internal += cur[1:]
+            else:
+                internal += cur
+        print(internal)
+        out = []
+        for loc, start, end in internal:
+            out.append( "{}: {}{}:{}{}".format(loc, str(start//60).zfill(2), str(start % 60).zfill(2), str(end//60).zfill(2), str(end % 60).zfill(2)))
+        return out
+
+
+
+
+
+
 
 
 class scheduler(Resource):

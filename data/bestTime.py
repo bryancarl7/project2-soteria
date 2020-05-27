@@ -67,7 +67,7 @@ class bestTime(Resource):
         times = None
         hours = [i for i in range(24)]
         if(test_list is not None):
-            if (len(test_list) is not 24):
+            if (len(test_list) != 24):
                 raise TypeError("Malformed list passed; needs 24 ints")
             times = test_list #Single list, so you don't have to type a full week's worth of info.
         else:
