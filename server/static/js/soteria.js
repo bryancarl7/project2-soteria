@@ -443,6 +443,12 @@ function getTimeDifference(index) {
 
 }
 
+function getPriority(index) {
+    let priority = "priority" + index;
+    var element = document.getElementById(priority);
+    return element.value;
+}
+
 function submitSCHEDULE(){
     // TODO
     var index = 1;
