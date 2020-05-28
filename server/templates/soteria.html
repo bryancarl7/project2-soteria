@@ -38,7 +38,13 @@
                   
         <div id="SCHEDULE" class="tabcontent">
             <h3>Schedule</h3>
-                <p>Scheduler</p>
+                <p>Instructions</p>
+                    <li>1. Fill out a schedule with places you plan on going to (e.g. specific restaurant, store, public park)</li>
+                    <li>2. Fill out the times you plan on going to each place</li>
+                    <li>3. Include a priority for going to every place on a scale from 1-5, with 1 being highest priority and 5 being lowest (entries can have the same priority!)</li>
+                    <li>4. Scroll to the right and click 'Add another row' to add more entries (make sure to scroll down within the scheduler to view added rows) </li>
+                    <li>5. Every row except for the first can be deleted by clicking 'Delete this row' located on the far right of each additional row
+                    <li>6. Once all rows are filled in properly, click Submit</li>
                     <table id = "schedule-table" width = "400px">
                         <tr>
                             <td>
@@ -67,7 +73,7 @@
                         <input type = "button" id = "submit" value = "Submit" onclick = "submitSCHEDULE()">
                     </table>
         </div>
-                  <div id = "OUTPUT">
+                  <div id = "OUTPUT" class = "parent">
                     <h1 id = "output_title"></h1>
                   </div>
         <script>
@@ -81,6 +87,7 @@
             var del_rows = [];
             var places = {};
             var bst_place;
+            var output_displayed = false;
             //var table = document.getElementById("schedule-table");
             initialize();
             // var apptIndex = 1;

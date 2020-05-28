@@ -1,28 +1,60 @@
 function deleteRow() {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var table = document.getElementById("schedule-table");
     let name = this.name;
     let row = parseInt(name.substring(3));
     table.deleteRow(row);
     del_rows.splice(row-1, 1);
 
-    updateRowDelIndexes(row-1);
+    updateIDs(row);
+    updateRowDelIndexes(row);
     current_row -= 1;
 
 }
 
 
+// deleting intermediary row, must update all other rows and their ids
+
+function updateIDs(row) {
+
+    for (var i = row+1; i < sched_id; i++) {
+
+        let from = document.getElementById("from"+i);
+        let to = document.getElementById("to"+i);
+        let priority = document.getElementById("priority"+i);
+        if (from != null) {
+            from.id = 'from'+(i-1);
+            to.id = 'to'+(i-1);
+            priority.id = 'priority'+(i-1);
+
+        }
+
+    }
+
+}
+
 function updateRowDelIndexes(row) {
     for (var i = row; i < del_rows.length; i++) {
-        del_rows[i].name = "row" + (i+1);
+        del_rows[i].name = "row" + (i);
     }
-    removeAutoRow(row);
+    console.log('ROW TO DELETE: ' + row);
+    places[row] = null;
+    auto_listeners.splice(row-1, 1);
+    auto_rows.splice(row-1, 1);
+    // removeAutoRow(row-1);
 }
 
 function compare(a, b) {
-
-    return a[1] - b[1];
-
+    if (a[0] === b[0]) {
+        return 0;
     }
+    else {
+        return (a[0] < b[0]) ? -1 : 1;
+    }
+}
 
     function checkTimesValidity() {
     var times = [];
@@ -39,7 +71,7 @@ function compare(a, b) {
             from_t = document.getElementById(from);
             to_t = document.getElementById(to);
             if (from_t.value == "" || to_t.value == "") {
-             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
             times.push([from_t.value, to_t.value])
@@ -49,7 +81,7 @@ function compare(a, b) {
             from_t = document.getElementById(from);
             to_t = document.getElementById(to);
             if (from_t.value == "" || to_t.value == "") {
-             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
             times.push([from_t.value, to_t.value])
@@ -58,6 +90,7 @@ function compare(a, b) {
 
     }
     times.sort(compare);
+    console.log(times);
     if (times.length > 1) {
 
       for (var j = 1; j < times.length; j++) {
@@ -87,7 +120,7 @@ function compare(a, b) {
             if (entry_t !== null) {
 
               if (entry_t.value == "") {
-             alert("ERROR: PLEASE ENTER VALID PLACES BEFORE ADDING MORE ROWS / SUBMITTING");
+             alert("ERROR: PLEASE ENTER VALID PLACES BEFORE ADDING MORE ROWS");
              return false;
             }
 
@@ -97,7 +130,7 @@ function compare(a, b) {
             // take as is
             entry_t = document.getElementById(entry);
             if (entry_t.value == "") {
-             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
 
@@ -122,7 +155,7 @@ function compare(a, b) {
                 if (entry_t !== null) {
 
                     if (entry_t.value == "") {
-                    alert("ERROR: PLEASE ENTER VALID PLACES BEFORE ADDING MORE ROWS / SUBMITTING");
+                    alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                     return false;
                 }
 
@@ -132,7 +165,7 @@ function compare(a, b) {
                 // take as is
                 entry_t = document.getElementById(entry);
                 if (entry_t.value == "") {
-                    alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
+                    alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                     return false;
                 }
 
@@ -145,7 +178,10 @@ function compare(a, b) {
         }
 // add a priority attribute to each row
 function insertRow(delete_function) {
-
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var table = document.getElementById("schedule-table");
     let valid_times = checkTimesValidity();
     if (valid_times) {
@@ -255,9 +291,7 @@ function removeAutoRow(del_row) {
 
 
 function addAutoRow() {
-    console.log($(document).ready(function($){}(jQuery)));
     jQuery(document).ready(function ($) {
-        console.log("currently here");
         $(function() {
             var new_sched_input = $("#SCHEDULE_INPUT" + sched_id)[0];
             auto_rows[current_row-1] = new google.maps.places.Autocomplete(new_sched_input);
@@ -276,13 +310,10 @@ function addAutoRow() {
                     (place.address_components[2] && place.address_components[2].short_name || '')
                 ].join(' ');
             }
-            console.log(address);
-            console.log(place);
-            places[current_index] = place;
+            places[sched_id] = place;
 
             });
         })
-        console.log($("#SCHEDULE_INPUT" + current_row)[0]);
     })
 
  }
@@ -359,30 +390,21 @@ bestPlace { location:(hour, ratio)}
 
 function submitBST(displayOutput){
     let BST = document.getElementById("BST_INPUT");
-
+    var valid = true;
     console.log(BST.value);
     if (BST.value == "") {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
+        valid = false;
       }
       console.log(bst_place);
 
-    let lat;
-    let long;
-
-    navigator.geolocation.getCurrentPosition(function f(args){
-        console.log("Args: " + args);
-        console.log("Arg Obj: " + Object.keys(args))
-        lat = args.latitude
-        long = args.longitude
 
         payload = {
-            "latitude" : lat,
-            "longitude" : long,
             "place" : bst_place
         }
         let output = document.getElementById("BST_OUTPUT");
 
-        console.log(payload);
+        if (valid) {
 
         $.ajax({
             url: "/times/bestTime",
@@ -393,21 +415,24 @@ function submitBST(displayOutput){
                 displayOutput(data, 'BST');
             }
         })
-    });
+
+        }
+
 }
 
 function submitBFT(){
     // TODO
+    var valid = true;
     var entry = document.getElementById("BFT_INPUT");
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
+      valid = false;
     }
         var payload = {
-            "latitude" : lat,
-            "longitude" : long,
             "type" : entry.value
         }
 
+        if (valid) {
         $.ajax({
             url: "/times/bestTime",
             type: "POST",
@@ -417,7 +442,41 @@ function submitBFT(){
                 displayOutput(data, 'BST');
             }
         })
-    console.log(entry.value);
+        }
+
+}
+function validTimeDifference(index) {
+    var to = "to";
+    var from = "from";
+    if (index != 0) {
+        to += index;
+        from += index;
+    }
+    let from_t = document.getElementById(from);
+    let to_t = document.getElementById(to);
+
+    if (from_t.value == "" || to_t.value == "") {
+        alert("ERROR: PLEASE ENTER VALID TIMES BEFORE SUBMITTING");
+        return false;
+    }
+
+    return true;
+}
+
+function validPriority(index) {
+    var priority = "priority";
+    if (index != 0) {
+        priority += index;
+    }
+    var element = document.getElementById(priority);
+    console.log(priority);
+    console.log(element);
+    console.log(document.getElementById("schedule-table"))
+    if (element.value == "") {
+        alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");  
+        return false;
+    }
+    return true;
 }
 
 function getTimeDifference(index) {
@@ -436,50 +495,169 @@ function getTimeDifference(index) {
     let from_t = document.getElementById(from);
     let to_t = document.getElementById(to);
 
-    var timeStart = new Date(today + " " + from_t.value).val();
-    var timeEnd = new Date(today + " " + to_t.value).val();
-
-    return timeEnd - timeStart;
+    var timeStart = new Date(today + " " + from_t.value).getHours();
+    var timeEnd = new Date(today + " " + to_t.value).getHours();
+    timeStart *= 60;
+    timeEnd *= 60;
+    return Math.abs(timeEnd - timeStart);
 
 }
 
 function getPriority(index) {
-    let priority = "priority" + index;
+    var priority = "priority";
+    if (index != 0) {
+        priority += index;
+    }
     var element = document.getElementById(priority);
     return element.value;
 }
+function displayOutput(data, type) {
 
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode(type + " Output");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    // var title = document.createElement("HEADER");
+    // title.innerHTML = type;
+    for (var i = 0; i < data.length; i++) {
+
+        var new_entry = document.createElement("div");
+        new_entry.class = "relative";
+        var from_time;
+        var min_from = data[i].startTime % 60;
+        var hrs_from = Math.floor(data[i].startTime / 60);
+        if (min_from < 10) {
+            let new_min_from = "0" + min_from;
+            min_from = new_min_from;
+        }
+        from_time = hrs_from + ":" + min_from;
+
+        var to_time;
+        var min_to = data[i].endTime % 60;
+        var hrs_to = Math.floor(data[i].endTime / 60);
+        if (min_to < 10) {
+            let new_min_to = "0" + min_to;
+            min_to = new_min_to;
+        }
+        to_time = hrs_to + ":" + min_to;
+        var newContent = document.createTextNode("You should go to " + data[i].place + " between " + from_time + " and " + to_time);
+        new_entry.appendChild(newContent);
+        output.appendChild(new_entry);
+
+    }
+    window.scrollBy(0, 500);
+    this.output_displayed = true;
+    console.log(output);
+
+
+}
 function submitSCHEDULE(){
     // TODO
     var index = 1;
     var output = [];
+    var valid = true;
+    payload = {};
+    console.log(places);
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
 
         if (i != 0) {
-            // update ids
-            entry += i;
-            entry_t = document.getElementById(entry);
-            if (entry_t !== null) {
+            var entry_t = "SCHEDULE_INPUT" + i;
+            var res = document.getElementById(entry_t);
+            console.log("i : " + i, " , output: " + res);
+            if (res != null) {
+                if (res.value != "") {
+                    let valid_priority = validPriority(index);
+                    if (valid_priority) {
+                        let valid_times = validTimeDifference(index);
+                        if (valid_times) {
+                            for (var j = 0; j < sched_id + 1; j++) {
+                                console.log(j);
+                                console.log(places[j]);
+                            }
+                            let add = {
+                            "place" : places[i+1],
+                            "time" : getTimeDifference(index),
+                            "priority" : getPriority(index)
+                            }
+                            payload[index] = add;
+                            index += 1;
 
-                let payload = {
-                    "place" : places[index],
-                    "time" : getTimeDifference(index),
-                    "priority" : getPriority(index)
+                        }
+                        else {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    else {
+                        valid = false;
+                        break;
+                    }
+
+                }
+                else {
+                    alert("ERROR: PLEASE ENTER VALID PLACES BEFORE SUBMITTING");
+                    valid = false;
                 }
 
             }
         }
         else {
             // take as is
-            entry_t = document.getElementById(entry);
-            if (entry_t.value == "") {
-             alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS / SUBMITTING");
-             return false;
+            var res = document.getElementById(entry);
+            if (res != null) {
+                if (res.value != "") {
+                    let valid_priority = validPriority(0);
+                    if (valid_priority) {
+                        let valid_times = validTimeDifference(0);
+                        if (valid_times) {
+                            let add = {
+                            "place" : places[0],
+                            "time" : getTimeDifference(0),
+                            "priority" : getPriority(0)
+                            }
+                            payload[0] = add;
+
+                        }
+                        else {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    else {
+                        valid = false;
+                        break;
+                    }
+                }
+                else {
+                    alert("ERROR: PLEASE ENTER VALID PLACES BEFORE SUBMITTING");
+                    valid = false;
+                }
             }
 
         }
     }
-    console.log(places);
+    if (valid) {
+    console.log(payload);
+
+        $.ajax({
+            url: "/times/bestTime",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function(data) {
+                let d = [
+                    {place: "Screen Door", startTime: 750, endTime: 880},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                ]
+                displayOutput(d, 'Scheduler');
+            }
+        })
+
+    }
 
 }
