@@ -52,7 +52,8 @@ class BusyTimesReporter():
         def has_value(cls, value):
             return value in cls._value2member_map_
 
-    def get_api_key():
+    @classmethod
+    def get_api_key(cls):
         """
         Returns the Google Maps API Key as specified in the 'credentials.ini'
         file (see README.md for more details).
@@ -85,13 +86,14 @@ class BusyTimesReporter():
         return API_KEY
 
     @classmethod
-    def get_busy_times(cls, location, mode):
+    def get_busy_times(cls, location, mode, place_type):
         """
         Returns a set of intervals representing the busy times of a location.
 
         Arguments:
             location    (String)                        - Google Maps Place ID
             mode        (Int or BusyTimesReporter.Mode) - Fetching Mode
+            place_type  (String)                        - Use to in simulation mode
         Returns:
             Dictionary                                  - Busy Time Intervals
                 Key     (String)                        - Day of the Week
@@ -110,6 +112,8 @@ class BusyTimesReporter():
             raise ValueError("argument 'mode' is invalid")
         if not isinstance(location, str):
             raise TypeError("argument 'location' must be of type str")
+        if not isinstance(place_type, str):
+            raise TypeError("argument 'place_type' must be of type str")
 
         # Standardize input
         if isinstance(mode, int):
@@ -169,11 +173,6 @@ class BusyTimesReporter():
 
                 busy_times[entry["name"]] = entry["data"]
         else:
-            # TODO: Determine Location Type and Pass to simulation manager
-            """
-            location_type = "temporary"
-            busy_times = SimulationManager.get_busy_times(location_type)
-            """
-            pass
+            busy_times = SimulationManager.get_busy_times(place_type)
 
         return busy_times

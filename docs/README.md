@@ -37,6 +37,7 @@ After installation, the user can access the web page via the following URL:
 The testing framework can be executed at anytime, by running `python3 -m test.test` (switch to script?).
 
 ## Directory Structure
+* populartimes/ - Local installation of the the populartimes package
 * data/
     * busy_times/
         * simulated_data/

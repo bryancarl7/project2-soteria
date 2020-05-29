@@ -56,7 +56,7 @@ function compare(a, b) {
     }
 }
 
-    function checkTimesValidity() {
+function checkTimesValidity() {
     var times = [];
     var from_t;
     var to_t;
@@ -85,9 +85,7 @@ function compare(a, b) {
              return false;
             }
             times.push([from_t.value, to_t.value])
-
         }
-
     }
     times.sort(compare);
     console.log(times);
@@ -106,9 +104,9 @@ function compare(a, b) {
 
     return true;
 
-    }
+}
 
-    function checkEntriesValidity() {
+function checkEntriesValidity() {
     var entry;
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
@@ -123,7 +121,6 @@ function compare(a, b) {
              alert("ERROR: PLEASE ENTER VALID PLACES BEFORE ADDING MORE ROWS");
              return false;
             }
-
             }
         }
         else {
@@ -135,47 +132,45 @@ function compare(a, b) {
             }
 
         }
+    }
+    return true;
+}
+
+function checkPriorities() {
+
+    var entry;
+    for (var i = 0; i < sched_id; i++) {
+        var entry = "priority";
+
+        if (i != 0) {
+            // update ids
+            entry += i;
+            entry_t = document.getElementById(entry);
+            if (entry_t !== null) {
+
+                if (entry_t.value == "") {
+                alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
+                return false;
+            }
+
+            }
+        }
+        else {
+            // take as is
+            entry_t = document.getElementById(entry);
+            if (entry_t.value == "") {
+                alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
+                return false;
+            }
+
+        }
 
     }
 
     return true;
 
-    }
+}
 
-    function checkPriorities() {
-
-        var entry;
-        for (var i = 0; i < sched_id; i++) {
-            var entry = "priority";
-
-            if (i != 0) {
-                // update ids
-                entry += i;
-                entry_t = document.getElementById(entry);
-                if (entry_t !== null) {
-
-                    if (entry_t.value == "") {
-                    alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
-                    return false;
-                }
-
-                }
-            }
-            else {
-                // take as is
-                entry_t = document.getElementById(entry);
-                if (entry_t.value == "") {
-                    alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
-                    return false;
-                }
-
-            }
-
-        }
-
-        return true;
-
-        }
 // add a priority attribute to each row
 function insertRow(delete_function) {
     if (this.output_displayed) {
@@ -441,7 +436,7 @@ function submitBFT(){
             success: function(data) {
                 displayOutput(data, 'BST');
             }
-        })
+        });
         }
 
 }
@@ -511,6 +506,7 @@ function getPriority(index) {
     var element = document.getElementById(priority);
     return element.value;
 }
+
 function displayOutput(data, type) {
 
     var output = document.getElementById("OUTPUT");
