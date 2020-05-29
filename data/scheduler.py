@@ -1,7 +1,6 @@
-import requests
 from data.apiHandler import apiKeyLoader
-from flask_restful import Resource
-from collections import OrderedDict
+from flask_restful import Resource, request
+import datetime, calendar, json
 from data.bestPlace import bestPlace
 
 PADDING = 10
@@ -161,28 +160,19 @@ class scheduleObj(object):
         return internal
 
 
-
-
-
-
-
-
 class scheduler(Resource):
-    def __init__(self):
-        self.apiHandler = apiKeyLoader()
-        self.id = ""
-        self.table = []
-
-    def get(self):
-        return '', 200
-
     def post(self):
-        return '', 200
+        # Take the JSON from the request
+        json_dump = request.get_json()
+        print(json.dumps(json_dump, indent=4))
 
-    def delete(self):
-        return '', 200
+        # Setup Place_ID
+        place_id = json_dump['place']  # add extra indexes to the end to sub-index the JSON
 
-    def create(self):
+        # Setup the day of the week
+        today = datetime.datetime.today()
+        day = calendar.day_name[today.weekday()]
+
         return '', 200
     
     @staticmethod

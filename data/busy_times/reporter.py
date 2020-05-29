@@ -52,7 +52,8 @@ class BusyTimesReporter():
         def has_value(cls, value):
             return value in cls._value2member_map_
 
-    def get_api_key():
+    @classmethod
+    def get_api_key(cls):
         """
         Returns the Google Maps API Key as specified in the 'credentials.ini'
         file (see README.md for more details).

@@ -55,17 +55,17 @@ def rect_circle_collision(rect_left, rect_right, rect_bottom, rect_top, circle_x
         return val
 
     # Find the closest point to the circle within the rectangle
-    closest_x = clamp(circle_x, rect_left, rect_right);
-    closest_y = clamp(circle_y, rect_bottom, rect_top);
+    closest_x = clamp(circle_x, rect_left, rect_right)
+    closest_y = clamp(circle_y, rect_bottom, rect_top)
 
     # Calculate the distance between the circle's center and this closest point
-    dist_x = circle_x - closest_x;
-    dist_y = circle_y - closest_y;
+    dist_x = circle_x - closest_x
+    dist_y = circle_y - closest_y
 
     # If the distance is less than the circle's radius, an intersection occurs
-    dist_sq = (dist_x * dist_x) + (dist_y * dist_y);
+    dist_sq = (dist_x * dist_x) + (dist_y * dist_y)
 
-    return dist_sq < (radius * radius);
+    return dist_sq < (radius * radius)
 
 def cover_rect_with_cicles(w, h, r):
     """
@@ -110,6 +110,7 @@ def cover_rect_with_cicles(w, h, r):
         res = res[0:-1]
 
     return res
+
 
 def get_circle_centers(b1, b2, radius):
     """
