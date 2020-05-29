@@ -373,7 +373,6 @@ bestPlace { location:(hour, ratio)}
 function submitBST(displayOutput){
     let entry = auto_bst.getPlace();
     var valid = true;
-    console.log(BST.value);
     if (BST.value == "") {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
@@ -386,7 +385,6 @@ function submitBST(displayOutput){
     let output = document.getElementById("BST_OUTPUT");
 
     if (valid) {
-
     $.ajax({
         url: "/times/bestTime",
         type: "POST",
@@ -562,7 +560,8 @@ function submitSCHEDULE(){
                             let add = {
                             "place" : places[i+1].id,
                             "time" : getTimeDifference(index),
-                            "priority" : getPriority(index)
+                            "priority" : getPriority(index),
+                            "types" : places[i+1].types
                             }
                             payload[index] = add;
                             index += 1;
@@ -599,7 +598,8 @@ function submitSCHEDULE(){
                             let add = {
                             "place" : places[0].id,
                             "time" : getTimeDifference(0),
-                            "priority" : getPriority(0)
+                            "priority" : getPriority(0),
+                            "types" : places[0].types
                             }
                             payload[0] = add;
 
