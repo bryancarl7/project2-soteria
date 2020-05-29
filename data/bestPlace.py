@@ -1,9 +1,7 @@
-import requests
 import json
 import multiprocessing
 import calendar
 import datetime
-from data.apiHandler import apiKeyLoader
 from flask_restful import Resource, reqparse, request
 import data.bestTime as bestTime
 from data.bestTime import bestTime
@@ -16,9 +14,7 @@ class bestPlace(Resource):
         print(json.dumps(json_dump, indent=4))
 
         # Setup Place_ID
-        places = json_dump['placeId']
-        location = json_dump['location']
-        types = json_dump['types']
+        places = json_dump['type']
 
         # Setup the day of the week
         today = datetime.datetime.today()
@@ -26,7 +22,7 @@ class bestPlace(Resource):
 
         # Retrieve the best times and return it
         ret = self.get_best_place(places, day)
-        return '', 200
+        return ret, 200
 
     @staticmethod
     def place_helper(d, location, day, test_list):

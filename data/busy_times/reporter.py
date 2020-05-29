@@ -132,8 +132,8 @@ class BusyTimesReporter():
 
         if mode == cls.Mode.ACCURATE:
             # Setup return
-            DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                    "Saturday", "Sunday")
+            DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                    "Saturday", "Sunday"]
             busy_times = dict.fromkeys(DAYS)
             result = None
 
@@ -180,4 +180,5 @@ class BusyTimesReporter():
         else:
             busy_times, flag = SimulationManager.get_busy_times(place_types)
             INACCURATE_FLAG = flag
+        print(busy_times)
         return busy_times, INACCURATE_FLAG

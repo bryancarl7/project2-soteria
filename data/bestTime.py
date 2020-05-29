@@ -30,7 +30,8 @@ class bestTime(Resource):
         day = calendar.day_name[today.weekday()]
 
         # Retrieve the best times and return it
-        ret = self.get_best_time(places, day)
+        ret, flag = self.get_best_time(places, day)
+        print(ret)
         return ret, 200
 
     @staticmethod
@@ -54,11 +55,11 @@ class bestTime(Resource):
             times = test_list #Single list, so you don't have to type a full week's worth of info.
         else:
             reporter = time_reporter.BusyTimesReporter()
-            result = reporter.get_busy_times(location, 1) #TODO: some sort of global or local var for busytimes mode selection
+            result, flag = reporter.get_busy_times(location, 1) #TODO: some sort of global or local var for busytimes mode selection
             times = result[day] #get the info, and then strip out what we need
         
         outlist = sorted(zip(hours, times), key=lambda pair: 1000 if pair[1] == 0 else pair[1] )
-        return outlist
+        return outlist, flag
 
 
 

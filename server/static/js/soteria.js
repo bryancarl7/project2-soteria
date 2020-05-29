@@ -377,7 +377,7 @@ function submitBST(displayOutput){
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
       }
-    payload = {
+    let payload = {
         placeId: entry.place_id,
         location: entry.geometry.location,
         type: entry.type
@@ -400,18 +400,18 @@ function submitBST(displayOutput){
 function submitBFT(){
     // TODO
     var valid = true;
-    var entry = document.getElementById("BFT_INPUT");
+    var entry = auto_bft.getPLace()
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
-        var payload = {
-            "type" : entry.value
+        let payload = {
+            "type" : entry.name
         }
 
         if (valid) {
         $.ajax({
-            url: "/times/bestTime",
+            url: "/times/bestPlace",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
