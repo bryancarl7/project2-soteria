@@ -391,11 +391,10 @@ function submitBST(displayOutput){
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
       }
-      console.log(bst_place);
 
 
         payload = {
-            "place" : bst_place
+            "place" : bst_place.id
         }
         let output = document.getElementById("BST_OUTPUT");
 
@@ -440,6 +439,8 @@ function submitBFT(){
         }
 
 }
+
+
 function validTimeDifference(index) {
     var to = "to";
     var from = "from";
@@ -490,11 +491,11 @@ function getTimeDifference(index) {
     let from_t = document.getElementById(from);
     let to_t = document.getElementById(to);
 
-    var timeStart = new Date(today + " " + from_t.value).getHours();
-    var timeEnd = new Date(today + " " + to_t.value).getHours();
-    timeStart *= 60;
-    timeEnd *= 60;
-    return Math.abs(timeEnd - timeStart);
+    var timeStart = new Date(today + " " + from_t.value);
+    var timeEnd = new Date(today + " " + to_t.value);
+    var diff = Math.abs(timeEnd - timeStart);
+    console.log(diff);
+    return Math.floor((diff/1000)/60);
 
 }
 
@@ -557,7 +558,6 @@ function submitSCHEDULE(){
     var output = [];
     var valid = true;
     payload = {};
-    console.log(places);
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
 
@@ -570,16 +570,12 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(index);
                         if (valid_times) {
-                            for (var j = 0; j < sched_id + 1; j++) {
-                                console.log(j);
-                                console.log(places[j]);
-                            }
 
 
                             // SEND TYPE ALONG WITH THE PLACE ID
-
+                            // console.log(places[i+1]);
                             let add = {
-                            "place" : places[i+1],
+                            "place" : places[i+1].id,
                             "time" : getTimeDifference(index),
                             "priority" : getPriority(index)
                             }
@@ -614,8 +610,9 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(0);
                         if (valid_times) {
+                            // console.log(places[0]);
                             let add = {
-                            "place" : places[0],
+                            "place" : places[0].id,
                             "time" : getTimeDifference(0),
                             "priority" : getPriority(0)
                             }
@@ -652,6 +649,15 @@ function submitSCHEDULE(){
                 let d = [
                     {place: "Screen Door", startTime: 750, endTime: 880},
                     {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+
                 ]
                 displayOutput(d, 'Scheduler');
             }
