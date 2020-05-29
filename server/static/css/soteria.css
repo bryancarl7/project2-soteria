@@ -24,6 +24,21 @@
   font-size: 20px;
 }
 
+li {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+div.relative {
+  position: relative;
+  width: 50%;
+  bottom: 5px;
+} 
+div.parent {
+  position: relative;
+  height: 200px;
+}
+
 /* Change background color of buttons on hover */
 .tab button:hover {
   background-color: #ddd;
@@ -44,7 +59,11 @@
   height: 300px;
   text-align: center;
 }
-body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif;}
+h2 {
+  font-family: "Lato", sans-serif;
+  color: red;
+}
+body,h1,h3,h4,h5,h6 {font-family: "Lato", sans-serif;}
 body, html {
     height: 100%;
     color: black;
@@ -66,6 +85,32 @@ select {
 #SCHEDULE_INPUT {
     width: 300px;
 }
+#schedule-table {
+  position:relative;
+
+}
+#SCHEDULE {
+  position: relative;
+  float:left;
+  overflow: auto;
+  height: 750px;
+  /* makes schedule scrollable */
+  /* overflow: auto; */
+
+}
+#output-header {
+  font-size: 40px;
+  stroke: red;
+  font-weight: bolder;
+}
+#OUTPUT {
+  position: relative;
+  clear: both;
+  text-align: center;
+  height: 400px;
+  font-size: 20px;
+  overflow: auto;
+}
 label {
     padding: 0px 10px;
     font-weight: 1000;
@@ -77,6 +122,7 @@ h1 {
 }
 div {
   position: relative;
+  width: 100%;
 }
 
 input[type=text] {
@@ -135,14 +181,14 @@ input[type=time]::-webkit-inner-spin-button {
 input[type=time]::-webkit-datetime-edit-hour-field {
   background-color: lightblue;
   border-radius: 15%;
-  padding: 19px 13px;
+  padding: 19px 5px;
 }
 
 /* Minute */
 input[type=time]::-webkit-datetime-edit-minute-field {
   background-color: lightblue;
   border-radius: 15%;
-  padding: 19px 13px;
+  padding: 19px 5px;
 }
 
 /* AM/PM */
@@ -150,5 +196,5 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
   background-color: #7155d3;
   border-radius: 15%;
   color: #fff;
-  padding: 10px 13px;
+  padding: 19px 5px
 }
