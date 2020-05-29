@@ -209,7 +209,7 @@ class scheduler(Resource):
         User-defined priority represents the order to select places: Users are asked to rate places with higher average customers closer to 1
         '''
         sched = scheduleObj(strict)
-        #build a list of priorities; the sentinel guarantees the last priority is run through the following loop.
+        #builds a list of priorities; the sentinel guarantees the last priority is run through the following loop.
         by_priority = sorted(schedule.items(), key = lambda pair: pair[1][0])
         sentinel = ("dummy", (999,999))
         by_priority.append(sentinel)
