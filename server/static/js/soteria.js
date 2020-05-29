@@ -568,7 +568,6 @@ function submitSCHEDULE(){
         if (i != 0) {
             var entry_t = "SCHEDULE_INPUT" + i;
             var res = document.getElementById(entry_t);
-            console.log("i : " + i, " , output: " + res);
             if (res != null) {
                 if (res.value != "") {
                     let valid_priority = validPriority(index);
@@ -579,6 +578,10 @@ function submitSCHEDULE(){
                                 console.log(j);
                                 console.log(places[j]);
                             }
+
+
+                            // SEND TYPE ALONG WITH THE PLACE ID
+
                             let add = {
                             "place" : places[i+1],
                             "time" : getTimeDifference(index),
