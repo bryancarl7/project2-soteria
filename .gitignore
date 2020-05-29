@@ -10,7 +10,7 @@ credentials.json
 # Distribution / packaging
 .Python
 .idea/
-build/
+builds/
 develop-eggs/
 dist/
 downloads/
