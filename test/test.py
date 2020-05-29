@@ -170,7 +170,7 @@ class BusyTimesReporterTests(unittest.TestCase):
         for location in locations:
             for mode in modeType:
                 print("Checking for location:", location, ", mode type:", mode)
-                result = BusyTimesReporter.get_busy_times(location, mode)
+                result = BusyTimesReporter.get_busy_times(location, mode, "restaurant")
                 if mode == BusyTimesReporter.Mode.SIMULATED: # Change when simulated working
                     result = True
                 self.assertIsNotNone(result)
