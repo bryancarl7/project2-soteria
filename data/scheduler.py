@@ -173,7 +173,7 @@ class scheduler(Resource):
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
 
-        return '', 200
+        return place_id, 200
     
     @staticmethod
     def build_greedy_list(curr_locations, day, test_dict = None):

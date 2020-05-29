@@ -16,7 +16,9 @@ class bestPlace(Resource):
         print(json.dumps(json_dump, indent=4))
 
         # Setup Place_ID
-        places = json_dump['place'][0]
+        places = json_dump['placeId']
+        location = json_dump['location']
+        types = json_dump['types']
 
         # Setup the day of the week
         today = datetime.datetime.today()

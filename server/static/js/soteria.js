@@ -316,19 +316,6 @@ function addAutoRow() {
 function initialize() {
     jQuery(document).ready(function ($) {
     $(function() {
-        var auto_bst;
-        // var auto_bft;
-        var auto_schedule;
-        var bst_input = $("#BST_INPUT")[0];
-        // var bft_input = $("#BFT_INPUT")[0];
-        var schedule_input = $("#SCHEDULE_INPUT")[0];
-
-        auto_bst = new google.maps.places.Autocomplete(bst_input);
-        // auto_bft = new google.maps.places.Autocomplete(bft_input);
-        auto_schedule = new google.maps.places.Autocomplete(schedule_input);
-        auto_bst.setFields(['address_components', 'geometry', 'icon', 'name', 'id', 'type']);
-        // auto_bft.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
-        auto_schedule.setFields(['address_components', 'geometry', 'icon', 'name', 'id', 'type']);
 
         // auto_bst listener
         auto_bst.addListener('place_changed', function() {
@@ -384,34 +371,32 @@ bestPlace { location:(hour, ratio)}
 
 
 function submitBST(displayOutput){
-    let BST = document.getElementById("BST_INPUT");
+    let entry = auto_bst.getPlace();
     var valid = true;
     console.log(BST.value);
     if (BST.value == "") {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
       }
+    payload = {
+        placeId: entry.place_id,
+        location: entry.geometry.location,
+        type: entry.type
+    }
+    let output = document.getElementById("BST_OUTPUT");
 
+    if (valid) {
 
-        payload = {
-            "place" : bst_place.id
+    $.ajax({
+        url: "/times/bestTime",
+        type: "POST",
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+        success: function(data) {
+            displayOutput(data, 'BST');
         }
-        let output = document.getElementById("BST_OUTPUT");
-
-        if (valid) {
-
-        $.ajax({
-            url: "/times/bestTime",
-            type: "POST",
-            data: JSON.stringify(payload),
-            contentType: "application/json",
-            success: function(data) {
-                displayOutput(data, 'BST');
-            }
-        })
-
-        }
-
+    })
+    }
 }
 
 function submitBFT(){

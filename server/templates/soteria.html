@@ -89,6 +89,19 @@
             var bst_place;
             var output_displayed = false;
             //var table = document.getElementById("schedule-table");
+            var auto_bst;
+            // var auto_bft;
+            var auto_schedule;
+            var bst_input = $("#BST_INPUT")[0];
+            // var bft_input = $("#BFT_INPUT")[0];
+            var schedule_input = $("#SCHEDULE_INPUT")[0];
+
+            auto_bst = new google.maps.places.Autocomplete(bst_input);
+            // auto_bft = new google.maps.places.Autocomplete(bft_input);
+            auto_schedule = new google.maps.places.Autocomplete(schedule_input);
+            auto_bst.setFields(['place_id', 'geometry', 'name', 'formatted_address', 'type']);
+            // auto_bft.setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
+            auto_schedule.setFields(['address_components', 'geometry', 'icon', 'name', 'id', 'type']);
             initialize();
             // var apptIndex = 1;
         </script>

@@ -22,15 +22,15 @@ class bestTime(Resource):
         print(json.dumps(json_dump, indent=4))
 
         # Setup Place_ID
-        place_id = json_dump['place']['id']
-        print("place_id: " + str(place_id))
+        places = json_dump['placeId']
+        location = json_dump['location']
 
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
 
         # Retrieve the best times and return it
-        ret = self.get_best_time(place_id, day)
+        ret = self.get_best_time(places, day)
         return ret, 200
 
     @staticmethod
