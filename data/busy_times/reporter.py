@@ -86,7 +86,7 @@ class BusyTimesReporter():
         return API_KEY
 
     @classmethod
-    def get_busy_times(cls, location, mode, place_type):
+    def get_busy_times(cls, location, mode, place_type=""):
         """
         Returns a set of intervals representing the busy times of a location.
 
