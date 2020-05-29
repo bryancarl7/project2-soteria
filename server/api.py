@@ -46,7 +46,7 @@ if __name__ == "__main__":
         print("Hosting Flask app on Port: " + str(PORT))
 
         # Run the app and get the successful exit
-        app.run(host=HOST, port=PORT, debug=True)
+        app.run(host=HOST, port=PORT, debug=False)
         app.logger.info("Successfully exited app")
 
     except Exception as ex:
