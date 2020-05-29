@@ -386,7 +386,6 @@ bestPlace { location:(hour, ratio)}
 function submitBST(displayOutput){
     let BST = document.getElementById("BST_INPUT");
     var valid = true;
-    console.log(BST.value);
     if (BST.value == "") {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
@@ -394,7 +393,8 @@ function submitBST(displayOutput){
 
 
         payload = {
-            "place" : bst_place.id
+            "place" : bst_place.id,
+            "types" : bst_place.types
         }
         let output = document.getElementById("BST_OUTPUT");
 
@@ -577,7 +577,8 @@ function submitSCHEDULE(){
                             let add = {
                             "place" : places[i+1].id,
                             "time" : getTimeDifference(index),
-                            "priority" : getPriority(index)
+                            "priority" : getPriority(index),
+                            "types" : places[i+1].types
                             }
                             payload[index] = add;
                             index += 1;
@@ -614,7 +615,8 @@ function submitSCHEDULE(){
                             let add = {
                             "place" : places[0].id,
                             "time" : getTimeDifference(0),
-                            "priority" : getPriority(0)
+                            "priority" : getPriority(0),
+                            "types" : places[0].types
                             }
                             payload[0] = add;
 
