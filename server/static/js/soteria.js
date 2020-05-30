@@ -605,7 +605,7 @@ function displayOutputBFT(data, names, ids) {
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Best For Type Output");
+    var t = document.createTextNode("Best Places Output");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
@@ -673,7 +673,7 @@ function displayOutputBST(data, place) {
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Best Single Time Output");
+    var t = document.createTextNode("Best Time Output");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
