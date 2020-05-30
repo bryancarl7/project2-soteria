@@ -417,6 +417,7 @@ function submitBST(){
         data: JSON.stringify(payload),
         contentType: "application/json",
         success: function(data) {
+            console.log(data);
             clearInterval(loadingInterval);
             displayOutputBST(data, entry.name);
         },
@@ -946,6 +947,7 @@ function submitSCHEDULE(){
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
+                console.log(data);
                 clearInterval(loadingInterval);
                 displayOutputSchedule(data, names);
             },
