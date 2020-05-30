@@ -259,7 +259,7 @@ function insertRow(delete_function) {
 function displayMode(evt, mode) {
     var i, tabcontent, tablinks;
     document.getElementById("OUTPUT").innerHTML = "";
-
+    this.output_displayed = false;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
@@ -421,9 +421,12 @@ function submitBFT(){
             success: function(data) {
                 displayOutputBFT(data);
             },
-            fail: function(data) {
+            statusCode: {
+                500: function() {
 
                 displayFailureMessage()
+
+                }
 
             }
         });
@@ -432,11 +435,15 @@ function submitBFT(){
 }
 
 function displayFailureMessage() {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var output = document.getElementById("OUTPUT");
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Error: could not find popular times data for the given place / type");
+    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for that place / type");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
@@ -511,7 +518,10 @@ function getPriority(index) {
 }
 
 function displayOutputBFT(data) {
-
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var output = document.getElementById("OUTPUT");
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
@@ -556,7 +566,10 @@ function displayOutputBFT(data) {
 }
 
 function displayOutputBST(data, place) {
-
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var output = document.getElementById("OUTPUT");
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
@@ -601,7 +614,10 @@ function displayOutputBST(data, place) {
 }
 
 function displayOutputSchedule(data) {
-
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var output = document.getElementById("OUTPUT");
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
@@ -674,7 +690,6 @@ function submitSCHEDULE(){
                             }
                             payload[index] = add;
                             index += 1;
-
                         }
                         else {
                             valid = false;
@@ -685,13 +700,11 @@ function submitSCHEDULE(){
                         valid = false;
                         break;
                     }
-
                 }
                 else {
                     alert("ERROR: PLEASE ENTER VALID PLACES BEFORE SUBMITTING");
                     valid = false;
                 }
-
             }
         }
         else {
@@ -711,7 +724,6 @@ function submitSCHEDULE(){
                             type : places[0].types
                             }
                             payload[0] = add;
-
                         }
                         else {
                             valid = false;
@@ -728,14 +740,13 @@ function submitSCHEDULE(){
                     valid = false;
                 }
             }
-
         }
     }
     if (valid) {
     console.log(payload);
 
         $.ajax({
-            url: "/times/bestTime",
+            url: "/scheduler/update",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
