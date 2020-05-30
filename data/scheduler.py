@@ -183,7 +183,7 @@ class scheduleObj(object):
         if hourobj.timeleft == 60 and hour < 23:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
             # Does not allow for schedules spanning two days.
-            if self.insert_right(location, hour+1, timeleft-60, closedtimes, start_time):
+            if self.insert_right(location, hour+1, timeleft-60, closedtimes):
                 # we were able to insert into later time slots; now, insert ourselves fully into this slot.
                 return hourobj.insert(location, 60)
         else:
