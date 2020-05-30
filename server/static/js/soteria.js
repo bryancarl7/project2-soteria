@@ -436,7 +436,7 @@ function displayFailureMessage() {
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Error: could not find popular times data for the given place / type");
+    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for that place / type");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
