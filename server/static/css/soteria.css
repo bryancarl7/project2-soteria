@@ -98,6 +98,16 @@ select {
   /* overflow: auto; */
 
 }
+#BST {
+  position: relative;
+  float:left;
+  height: 400px;
+}
+#BFT {
+  position: relative;
+  float:left;
+  height: 400px;
+}
 #output-header {
   font-size: 40px;
   stroke: red;
