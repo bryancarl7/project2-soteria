@@ -409,7 +409,7 @@ function submitBFT(){
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
-
+        var names = [];
 
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs"; // site that doesn’t send Access-Control-*
@@ -422,6 +422,7 @@ function submitBFT(){
             for (var i = 0; i < 10; i++) {
                 let cur = results[i];
                 placeIds.push(cur.place_id);
+                names.push(cur.name);
             }
             let payload = {
             type : placeIds
@@ -434,7 +435,7 @@ function submitBFT(){
                 contentType: "application/json",
                 success: function(data) {
                     console.log(data);
-                    displayOutputBFT(data);
+                    displayOutputBFT(data, names, placeIds);
                 },
                 statusCode: {
                     500: function() {
@@ -539,7 +540,7 @@ function getPriority(index) {
 }
 
 // completely incorrect since don't know the output
-function displayOutputBFT(data) {
+function displayOutputBFT(data, names, ids) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -548,34 +549,50 @@ function displayOutputBFT(data) {
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Best Single Time Output");
+    var t = document.createTextNode("Best For Type Output");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
-    for (var j = 0; j < data.length; j++) {
-        let cur = data[j];
+    for (var j = 0; j < ids.length; j++) {
+        let cur = data[ids[j]];
+        console.log(cur);
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
-        var newContent = document.createTextNode("These are the times for " + cur.name + " in order from least busy to most busy: ");
-        new_entry.appendChild(newContent);
-    for (var i = 0; i < cur.times.length; i++) {
-        let cur_time = cur.times[i];
+        var newContent1 = document.createTextNode("These are the times for ");
+        var newContent2 = document.createTextNode(" in order from least busy to most busy: ");
+        var container = document.createElement("span");
+        var contentName = document.createTextNode(names[j]);
+        container.appendChild(contentName);
+        container.style.color = "red";
+        new_entry.appendChild(newContent1);
+        new_entry.appendChild(container);
+        new_entry.appendChild(newContent2);
+    for (var i = 0; i < cur.length; i++) {
+        let cur_time = cur[i];
         if (cur_time[1] == 0) {
             break;
         }
         if (i < 3) {
             var bold = document.createElement("strong");
-            var newOne = document.createTextNode((i+1) + ") ");
+            var newOne = document.createTextNode(", ");
+            var container = document.createElement("span");
             var time = document.createTextNode(cur_time[0] + ":00  ");
             bold.appendChild(time);
-            new_entry.appendChild(newOne);
-            new_entry.appendChild(bold);
+            container.appendChild(bold);
+            container.style.color = "green";
+            if (i != 0) {
+                new_entry.appendChild(newOne);
+                new_entry.appendChild(container);
+            }
+            else {
+                new_entry.appendChild(container);
+            }
 
         }
         else {
-        var newOne = document.createTextNode((i+1) + ") " + cur_time[0] + ":00  ");
+        var newOne = document.createTextNode(", " + cur_time[0] + ":00  ");
         new_entry.appendChild(newOne);
         }
 
@@ -607,8 +624,15 @@ function displayOutputBST(data, place) {
     // title.innerHTML = type;
     var new_entry = document.createElement("div");
     new_entry.class = "relative";
-    var newContent = document.createTextNode("These are the times for " + place + " in order from least busy to most busy: ");
-    new_entry.appendChild(newContent);
+    var newContent1 = document.createTextNode("These are the times for ");
+    var newContent2 = document.createTextNode(" in order from least busy to most busy: ");
+    var container = document.createElement("span");
+    var contentName = document.createTextNode(place);
+    container.appendChild(contentName);
+    container.style.color = "red";
+    new_entry.appendChild(newContent1);
+    new_entry.appendChild(container);
+    new_entry.appendChild(newContent2);
     for (var i = 0; i < data.length; i++) {
 
         if (data[i][1] == 0) {
@@ -616,15 +640,23 @@ function displayOutputBST(data, place) {
         }
         if (i < 3) {
             var bold = document.createElement("strong");
-            var newOne = document.createTextNode((i+1) + ") ");
+            var newOne = document.createTextNode(", ");
+            var container = document.createElement("span");
             var time = document.createTextNode(data[i][0] + ":00  ");
             bold.appendChild(time);
-            new_entry.appendChild(newOne);
-            new_entry.appendChild(bold);
+            container.appendChild(bold);
+            container.style.color = "green";
+            if (i != 0) {
+                new_entry.appendChild(newOne);
+                new_entry.appendChild(container);
+            }
+            else {
+                new_entry.appendChild(container);
+            }
 
         }
         else {
-        var newOne = document.createTextNode((i+1) + ") " + data[i][0] + ":00  ");
+        var newOne = document.createTextNode(", " + data[i][0] + ":00  ");
         new_entry.appendChild(newOne);
         }
 
@@ -638,9 +670,10 @@ function displayOutputBST(data, place) {
 
 }
 
-
+// need to test clicking submit a bunch of times 
 function displayOutputSchedule(data, names) {
     console.log(data);
+    console.log(this.output_displayed)
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -655,12 +688,14 @@ function displayOutputSchedule(data, names) {
     output.appendChild(title);
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
-    for (var i = 0; i < data.length; i++) {
-        let current = data[i][0];
-        let name = names[i];
-        if (name != null) {
-        let startTime = current[1];
-        let endTime = current[2];
+    var valid_array = data[0];
+    var invalid_array = data[1];
+    for (var i = 0; i < valid_array.length; i++) {
+        let cur = valid_array[i];
+        let name = names[cur[0]];
+        let startTime = cur[1];
+        let endTime = cur[2];
+
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
         var from_time;
@@ -680,19 +715,59 @@ function displayOutputSchedule(data, names) {
             min_to = new_min_to;
         }
         to_time = hrs_to + ":" + min_to;
-        var newContent = document.createTextNode("You should go to " + name + " between " + from_time + " and " + to_time);
-        new_entry.appendChild(newContent);
+
+        var newContent1 = document.createTextNode("You should go to ");
+        var newContent2 = document.createTextNode(" between ");
+        var newContent3 = document.createTextNode(" and ");
+        var container = document.createElement("span");
+        var contentName = document.createTextNode(name);
+        container.appendChild(contentName);
+        container.style.color = "red";
+        new_entry.appendChild(newContent1);
+        new_entry.appendChild(container);
+        new_entry.appendChild(newContent2);
+        var time_container1 = document.createElement("span");
+        var time_container2 = document.createElement("span");
+        var f_node = document.createTextNode(from_time);
+        var t_node = document.createTextNode(to_time);
+        time_container1.appendChild(f_node)
+        time_container1.style.color = "green";
+        new_entry.appendChild(time_container1);
+        new_entry.appendChild(newContent3);
+        time_container2.appendChild(t_node);
+        time_container2.style.color = "green";
+        new_entry.appendChild(time_container2);
         output.appendChild(new_entry);
         }
-        else {
-            break;
-        }
+        if (invalid_array.length > 0) {
+            var new_entry = document.createElement("div");
+            new_entry.class = "relative";
+            var container = document.createElement("span");
+            var newContent = document.createTextNode("We were unable to schedule the following places: ");
+            container.appendChild(newContent);
+            container.style.color = "red";
+            new_entry.appendChild(container);
+            for (var i = 0; i < invalid_array.length; i++) {
+                let cur = invalid_array[i];
+                let name = names[cur];
+                var new_name;
+                if (i == invalid_array.length - 1) {
+                    new_name = document.createTextNode(name);
 
-    }
+
+                }
+                else {
+                    new_name = document.createTextNode(name + ", ");
+                }
+                new_entry.appendChild(new_name);
+            }
+
+            output.appendChild(new_entry);
+
+
+        }
     window.scrollBy(0, 500);
     this.output_displayed = true;
-    console.log(output);
-
 
 }
 
@@ -701,7 +776,7 @@ function displayOutputSchedule(data, names) {
 
 function submitSCHEDULE(){
     // TODO
-    var names = [];
+    var names = {};
     var index = 1;
     var output = [];
     var valid = true;
@@ -722,9 +797,7 @@ function submitSCHEDULE(){
 
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
-                            console.log(places[i+1]);
-                            console.log(places[i]);
-                            names.push(places[i+1].name);
+                            names[places[i+1].place_id] = places[i+1].name;
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
@@ -767,7 +840,7 @@ function submitSCHEDULE(){
                             priority : getPriority(0),
                             type : places[0].types
                             }
-                            names.push(places[0].name);
+                            names[places[0].place_id] = places[0].name;
                             payload[0] = add;
                         }
                         else {
