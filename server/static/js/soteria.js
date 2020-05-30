@@ -455,6 +455,7 @@ function submitBFT(){
         window.scrollBy(0, 200);
 
         var names = [];
+        var addresses = [];
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs"; // site that doesn’t send Access-Control-*
         fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
@@ -472,6 +473,7 @@ function submitBFT(){
                 let cur = results[i];
                 placeIds.push(cur.place_id);
                 names.push(cur.name);
+                addresses.push(cur.formatted_address)
             }
             let payload = {
             type : placeIds
@@ -486,7 +488,7 @@ function submitBFT(){
                 success: function(data) {
                     console.log(data);
                     clearInterval(loadingInterval);
-                    displayOutputBFT(data, names, placeIds);
+                    displayOutputBFT(data, names, placeIds, addresses);
                 },
                 statusCode: {
                     500: function() {
@@ -595,7 +597,7 @@ function getPriority(index) {
 }
 
 // completely incorrect since don't know the output
-function displayOutputBFT(data, names, ids) {
+function displayOutputBFT(data, names, ids, addresses) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -617,12 +619,26 @@ function displayOutputBFT(data, names, ids) {
         new_entry.class = "relative";
         var newContent1 = document.createTextNode("These are the times for ");
         var newContent2 = document.createTextNode(" in order from least busy to most busy: ");
+
+        //new
+        var div_container = document.createElement("div");
+        div_container.id = "popupparent";
+
         var container = document.createElement("span");
         var contentName = document.createTextNode(names[j]);
         container.appendChild(contentName);
         container.style.color = "red";
+
+        // new
+        div_container.append(container);
+        var popup = document.createElement("div");
+        popup.id = "popup";
+        popup.textContent = "   " + addresses[j];
+        div_container.append(popup);
+
         new_entry.appendChild(newContent1);
-        new_entry.appendChild(container);
+        // new_entry.appendChild(container);
+        new_entry.appendChild(div_container);
         new_entry.appendChild(newContent2);
     for (var i = 0; i < cur.length; i++) {
         let cur_time = cur[i];
