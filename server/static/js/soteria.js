@@ -639,7 +639,8 @@ function displayOutputBST(data, place) {
 }
 
 
-function displayOutputSchedule(data) {
+function displayOutputSchedule(data, names) {
+    console.log(data);
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -655,12 +656,16 @@ function displayOutputSchedule(data) {
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
     for (var i = 0; i < data.length; i++) {
-
+        let current = data[i][0];
+        let name = names[i];
+        if (name != null) {
+        let startTime = current[1];
+        let endTime = current[2];
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
         var from_time;
-        var min_from = data[i].startTime % 60;
-        var hrs_from = Math.floor(data[i].startTime / 60);
+        var min_from = startTime % 60;
+        var hrs_from = Math.floor(startTime / 60);
         if (min_from < 10) {
             let new_min_from = "0" + min_from;
             min_from = new_min_from;
@@ -668,16 +673,20 @@ function displayOutputSchedule(data) {
         from_time = hrs_from + ":" + min_from;
 
         var to_time;
-        var min_to = data[i].endTime % 60;
-        var hrs_to = Math.floor(data[i].endTime / 60);
+        var min_to = endTime % 60;
+        var hrs_to = Math.floor(endTime / 60);
         if (min_to < 10) {
             let new_min_to = "0" + min_to;
             min_to = new_min_to;
         }
         to_time = hrs_to + ":" + min_to;
-        var newContent = document.createTextNode("You should go to " + data[i].place + " between " + from_time + " and " + to_time);
+        var newContent = document.createTextNode("You should go to " + name + " between " + from_time + " and " + to_time);
         new_entry.appendChild(newContent);
         output.appendChild(new_entry);
+        }
+        else {
+            break;
+        }
 
     }
     window.scrollBy(0, 500);
@@ -692,6 +701,7 @@ function displayOutputSchedule(data) {
 
 function submitSCHEDULE(){
     // TODO
+    var names = [];
     var index = 1;
     var output = [];
     var valid = true;
@@ -714,12 +724,14 @@ function submitSCHEDULE(){
                             // console.log(places[i+1]);
                             console.log(places[i+1]);
                             console.log(places[i]);
+                            names.push(places[i+1].name);
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
                             type : places[i+1].types
                             }
+
                             payload[index] = add;
                             index += 1;
                         }
@@ -755,6 +767,7 @@ function submitSCHEDULE(){
                             priority : getPriority(0),
                             type : places[0].types
                             }
+                            names.push(places[0].name);
                             payload[0] = add;
                         }
                         else {
@@ -783,7 +796,15 @@ function submitSCHEDULE(){
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
-                displayOutputSchedule(data);
+                displayOutputSchedule(data, names);
+            },
+            statusCode: {
+                500: function() {
+
+                displayFailureMessage()
+
+                }
+
             }
         })
 
