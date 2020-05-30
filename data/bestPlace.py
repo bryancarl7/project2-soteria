@@ -30,8 +30,9 @@ class bestPlace(Resource):
         wrapper for bestPlace call, assigns return to the proxydict.
         '''
         ret, flag = bestTime.get_best_time(location, day, test_list)
+        print(flag)
         d[location] = ret
-
+        d[(location + "flag")] = flag
 
     @staticmethod
     def get_best_place(locations, day, test_dict = None):
@@ -42,7 +43,7 @@ class bestPlace(Resource):
         # setup multiprocessing
         manager = multiprocessing.Manager()
         proxdict = manager.dict( { i : None for i in locations } )
-        
+        simkeys = {}
         arglist = None
         if(test_dict is not None):
             try:
@@ -57,6 +58,8 @@ class bestPlace(Resource):
 
         result = proxdict.copy() #managers aren't cleaned up at scope exit, so we have to copy this here.
         manager.shutdown()
+        for loc in locations:
+            simkeys[loc] = result.pop( (loc+"flag") )
 
-        return result
+        return result, simkeys
 

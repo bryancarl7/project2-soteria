@@ -13,6 +13,14 @@ import data.busy_times.reporter as time_reporter
 from data.apiHandler import apiKeyLoader
 import datetime
 import calendar
+import enum
+
+# Enum class for flags
+class Flag(enum.Enum):
+    OK = 0
+    SIMULATED_INACCURATE = 1
+    ACCURATE_FAILED = 2
+    ACCURATE_FAILED_SIMULATED_INACCURATE = 3
 
 
 class bestTime(Resource):
@@ -49,7 +57,7 @@ class bestTime(Resource):
         '''
         times = None
         hours = [i for i in range(24)]
-        flag = False
+        flag = Flag(0)
         if test_list:
             if len(test_list) != 24:
                 raise TypeError("Malformed list passed; needs 24 ints")

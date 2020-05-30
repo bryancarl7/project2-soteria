@@ -361,7 +361,7 @@ class scheduler(Resource):
             unable to allocate that location in the schedule.
             also creates a dictionary of location:closedtimes, for insertion purposes.
         '''
-        tempdict = bestPlace.get_best_place(curr_locations, day, test_dict)
+        tempdict, flaglist = bestPlace.get_best_place(curr_locations, day, test_dict)
         tuplelist = []
         closed_hours = {x:[] for x in curr_locations}
         resorted_dict = {}
@@ -372,7 +372,7 @@ class scheduler(Resource):
                 resorted_dict[k][hour] = pop
                 if pop == 0:
                     closed_hours[k].append(hour)
-        return resorted_dict, closed_hours, sorted(tuplelist, key = lambda triple: 1000 if triple[2] == 0 else triple[2])
+        return resorted_dict, closed_hours, sorted(tuplelist, key = lambda triple: 1000 if triple[2] == 0 else triple[2]), flaglist
 
 
     @classmethod
@@ -467,6 +467,7 @@ class scheduler(Resource):
         sentinel = ("dummy", (999,999))
         by_priority.append(sentinel)
         
+        flags = {} #master list of flags
         #initial variables. By priority: (location, (priority, time))
         curr_locations = [by_priority[0][0]]
         curr_priority = by_priority[0][1][0]
@@ -478,14 +479,17 @@ class scheduler(Resource):
                 curr_times[key] = time
                 continue
 
-            print("stepping into allocations with list: ")
-            print(str(curr_locations))
-            print("")
+            #print("stepping into allocations with list: ")
+            #print(str(curr_locations))
+            #print("")
             # Priority has changed, try to add previous to schedule.
             test_subset = None
             if test_dict is not None:
                 test_subset = {x:test_dict[x] for x in curr_locations}
-            poplist, closedlist, glist = cls.build_greedy_list(curr_locations, day, test_subset)
+            poplist, closedlist, glist, flaglist = cls.build_greedy_list(curr_locations, day, test_subset)
+            #keep master list updated
+            flags.update(flaglist)
+
             successful_inserts = []
             failed_to_schedule = []
             if (strict == True) or (bruteforce == False):
@@ -524,7 +528,9 @@ class scheduler(Resource):
             curr_times = {key: time}
         schedlist = sched.to_list()
         failed_to_schedule = []
- 
+        for x in schedlist:
+            loc = x[0]
+            x.append(flags[loc])
         if len(schedlist) < len(schedule):
             failed_to_schedule = list(schedule)
             for x in schedlist:
@@ -532,5 +538,5 @@ class scheduler(Resource):
                 print(loc)
                 if loc in failed_to_schedule:
                     failed_to_schedule.remove(loc)
-        return sched.to_list(), failed_to_schedule
+        return schedlist, failed_to_schedule
 
