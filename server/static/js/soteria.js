@@ -92,7 +92,7 @@ function checkTimesValidity() {
 
       for (var j = 1; j < times.length; j++) {
 
-        if (times[j][0] < times[j-1][1] && times[j][0] > times[j-1][0]) {
+        if (times[j][0] <= times[j-1][1] && times[j][0] >= times[j-1][0]) {
           alert("ENTRIES OVERLAP: PLEASE MAKE SURE NONE OF YOUR ACTIVITIES OVERLAP IN TIME")
           return false;
         }

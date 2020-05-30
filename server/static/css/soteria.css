@@ -93,7 +93,7 @@ select {
   position: relative;
   float:left;
   overflow: auto;
-  height: 750px;
+  height: 850px;
   /* makes schedule scrollable */
   /* overflow: auto; */
 
@@ -129,6 +129,13 @@ label {
 h1 {
     text-align: left;
     padding: 22px 16px;
+}
+h4 {
+    text-align: center;
+    padding: 10px 10px;
+    font-size: 20px;
+    font-weight: bolder;
+    color: blue;
 }
 div {
   position: relative;
