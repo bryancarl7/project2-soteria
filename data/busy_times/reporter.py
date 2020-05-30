@@ -3,7 +3,7 @@ reporter.py
 
 ===============================================================================
 
-Last Modified: 22 May 2020
+Last Modified: 29 May 2020
 Modification By: Carter Perkins
 
 Creation Date: 21 May 2020
@@ -51,6 +51,13 @@ class BusyTimesReporter():
         @classmethod
         def has_value(cls, value):
             return value in cls._value2member_map_
+
+    # Enum class for flags
+    class Flag(enum.Enum):
+        OK = 0
+        SIMULATED_INACCURATE = 1
+        ACCURATE_FAILED = 2
+        ACCURATE_FAILED_SIMULATED_INACCURATE = 3
 
     @classmethod
     def get_api_key(cls):
@@ -128,7 +135,7 @@ class BusyTimesReporter():
         gmaps = googlemaps.Client(key=API_KEY)
 
         busy_times = None
-        INACCURATE_FLAG = False
+        FLAG = cls.Flag.OK
 
         if mode == cls.Mode.ACCURATE:
             # Setup return
@@ -151,7 +158,11 @@ class BusyTimesReporter():
 
             # Validate web crawler data from 'populartimes'
             if "populartimes" not in result.keys():
-                raise KeyError("package 'populartimes' could not get populartimes data")
+                FLAG = cls.Flag.ACCURATE_FAILED
+                busy_times, flag = SimulationManager.get_busy_times(place_types)
+                if flag:
+                    FLAG = cls.Flag.ACCURATE_FAILED_SIMULATED_INACCURATE
+                return busy_times, FLAG
 
             for entry in result["populartimes"]:
                 failure_flag = False
@@ -179,6 +190,9 @@ class BusyTimesReporter():
                 busy_times[entry["name"]] = entry["data"]
         else:
             busy_times, flag = SimulationManager.get_busy_times(place_types)
-            INACCURATE_FLAG = flag
+            if flag:
+                FLAG = cls.Flag.SIMULATED_INACCURATE
+            else:
+                FLAG = cls.Flag.OK
         print(busy_times)
-        return busy_times, INACCURATE_FLAG
+        return busy_times, FLAG

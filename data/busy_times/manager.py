@@ -18,6 +18,7 @@ with the driver of the larger module found in 'reporter.py'.
 
 # Standard Imports
 import csv
+import enum
 import os
 
 class SimulationManager():
