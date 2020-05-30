@@ -14,24 +14,25 @@
     <body>
         <h1>SOTERIA</h1>
         <div class="tab">
-            <button class="tablinks" onclick="displayMode(event, 'BST')" id="defaultOpen">Best Single Time</button>
-            <button class="tablinks" onclick="displayMode(event, 'BFT')">Best For Type</button>
+            <button class="tablinks" onclick="displayMode(event, 'BST')" id="defaultOpen">Best Time</button>
+            <button class="tablinks" onclick="displayMode(event, 'BFT')">Best Places</button>
             <button class="tablinks" onclick="displayMode(event, 'SCHEDULE')">Schedule</button>
         </div>
         <div id="BST" class="tabcontent">
-            <h3>Best Single Time</h3>
+            <h3>Best Time</h3>
                 <p>Instructions</p>
                     <li>1. Enter a specific place you'd like to go (e.g. specific restaurant, store, public park)</li>
-                    <li>2. Click 'Submit' to see popular times</li>
+                    <li>2. Click 'Submit' to see popular times for the inputted place</li>
+
             <input type = "text" id = "BST_INPUT">
             <input type = "button" id = "submit" value = "Submit" onclick = "submitBST()">
         </div>
                   
         <div id="BFT" class="tabcontent">
-            <h3>Best For Type</h3>
+            <h3>Best Places</h3>
                 <p>Instructions</p>
-                    <li>1. Enter a type of place you plan on going to (e.g. restaurant, breakfast place, golf store)</li>
-                    <li>2. Click Submit</li>
+                    <li>1. Enter a general place query that includes your location (e.g. parks in Portland, restaurants in Eugene, post offices in San Francisco)</li>
+                    <li>2. Click 'Submit' to see places returned from your query with their corresponding busy times</li>
             <input type = "text" id = "BFT_INPUT">
             <input type = "button" id = "submit" value = "Submit" onclick = "submitBFT()">
         </div>
@@ -44,7 +45,7 @@
                     <li>3. Include a priority for going to every place on a scale from 1-5, with 1 being highest priority and 5 being lowest (entries can have the same priority!)</li>
                     <li>4. Scroll to the right and click 'Add another row' to add more entries (make sure to scroll down within the scheduler to view added rows) </li>
                     <li>5. Every row except for the first can be deleted by clicking 'Delete this row' located on the far right of each additional row
-                    <li>6. Once all rows are filled in properly, click Submit</li>
+                    <li>6. Once all rows are filled in properly, click 'Submit' to view an optimal schedule with the least busy times for your inputted places</li>
                     <table id = "schedule-table" width = "400px">
                         <tr>
                             <td>
