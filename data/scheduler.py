@@ -4,7 +4,7 @@ import datetime, calendar, json
 from data.bestPlace import bestPlace
 from copy import deepcopy
 
-PADDING = 10
+PADDING = 0
 '''if we try to insert into an hour with <PADDING minutes left and need to
     add remaining time to the next, we instead ignore it. Mostly for elegance: 
     stops situations where you get a schedule of "go to location from 10:58 to 11:43".
@@ -427,7 +427,7 @@ class scheduler(Resource):
     @classmethod
     def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = False):
         '''
-        Dict(location:(priority, time??)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
+        Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
         
         Given an initial user-defined schedule and the weekday the schedule would be followed, tries to optimize it to ensure as little human contact as possible.
@@ -490,4 +490,11 @@ class scheduler(Resource):
             curr_priority = priority
             curr_locations = [key] 
             curr_times = {key: time}
-        return sched.to_list()
+        schedlist = sched.to_list()
+        failed_to_schedule = schedule.keys()
+        if len(schedlist) < len(schedule):
+            for loc, start, end in schedlist:
+                if loc in failed_to_schedule:
+                    failed_to_schedule.remove(loc)
+        return schedlist, failed_to_schedule
+

@@ -29,7 +29,8 @@ class bestPlace(Resource):
         '''
         wrapper for bestPlace call, assigns return to the proxydict.
         '''
-        d[location] = bestTime.get_best_time(location, day, test_list)
+        ret, flag = bestTime.get_best_time(location, day, test_list)
+        d[location] = ret
 
 
     @staticmethod

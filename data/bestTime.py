@@ -49,6 +49,7 @@ class bestTime(Resource):
         '''
         times = None
         hours = [i for i in range(24)]
+        flag = False
         if test_list:
             if len(test_list) != 24:
                 raise TypeError("Malformed list passed; needs 24 ints")
