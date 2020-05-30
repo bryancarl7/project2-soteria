@@ -371,11 +371,23 @@ bestTime [(hour, ratio)]
 bestPlace { location:(hour, ratio)}
 */
 
+function loading() {
+    loopItem += 1;
+    if (loopItem == 3) {
+        loopItem = 0;
+    }
+    document.getElementById("OUTPUT").innerHTML = "<span style='color: blue; font-weight: bolder;'>Loading" + dots[loopItem] + "</span>";
+
+}
 
 function submitBST(){
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     let entry = auto_bst.getPlace();
     var valid = true;
-    if (BST.value == "") {
+    if (document.getElementById("BST_INPUT").value == "" || entry == undefined) {
         alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
       }
@@ -384,7 +396,9 @@ function submitBST(){
         location: entry.geometry.location,
         type: entry.types
     }
-    let output = document.getElementById("BST_OUTPUT");
+    loadingInterval = setInterval(loading, 250);
+    this.output_displayed = true;
+    window.scrollBy(0, 200);
 
     if (valid) {
     $.ajax({
@@ -393,14 +407,31 @@ function submitBST(){
         data: JSON.stringify(payload),
         contentType: "application/json",
         success: function(data) {
+            clearInterval(loadingInterval);
             displayOutputBST(data, entry.name);
-        }
+        },
+        statusCode: {
+                    500: function() {
+                    clearInterval(loadingInterval);
+                    displayFailureMessage()
+
+                    }
+
+                }
     })
+    }
+    else {
+
+        clearInterval(loadingInterval);
+
     }
 }
 
 function submitBFT(){
-    // TODO
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var valid = true;
    //  var entry = auto_bft.getPLace()
     var entry = document.getElementById("BFT_INPUT");
@@ -409,14 +440,22 @@ function submitBFT(){
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
-        var names = [];
+        loadingInterval = setInterval(loading, 250);
+        this.output_displayed = true;
+        window.scrollBy(0, 200);
 
+        var names = [];
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs"; // site that doesn’t send Access-Control-*
         fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
         .then(response => response.json())
         .then(contents => {
             console.log(contents); 
+            if (contents.status == "ZERO_RESULTS") {
+                clearInterval(loadingInterval);
+                displayFailureMessage();
+            }
+            else {
             let results = contents.results;
             var placeIds = [];
             for (var i = 0; i < 10; i++) {
@@ -427,6 +466,7 @@ function submitBFT(){
             let payload = {
             type : placeIds
             }
+            
             if (valid) {
             $.ajax({
                 url: "/times/bestPlace",
@@ -435,11 +475,12 @@ function submitBFT(){
                 contentType: "application/json",
                 success: function(data) {
                     console.log(data);
+                    clearInterval(loadingInterval);
                     displayOutputBFT(data, names, placeIds);
                 },
                 statusCode: {
                     500: function() {
-
+                    clearInterval(loadingInterval);
                     displayFailureMessage()
 
                     }
@@ -447,7 +488,11 @@ function submitBFT(){
                 }
             });
             }
-
+            
+            else {
+                clearInterval(loadingInterval);
+            }
+            }
             })
         .catch(() => displayFailureMessage());
 
@@ -557,7 +602,7 @@ function displayOutputBFT(data, names, ids) {
     // title.innerHTML = type;
     for (var j = 0; j < ids.length; j++) {
         let cur = data[ids[j]];
-        console.log(cur);
+        if (cur[0][1] != 0) {
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
         var newContent1 = document.createTextNode("These are the times for ");
@@ -597,10 +642,11 @@ function displayOutputBFT(data, names, ids) {
         }
 
     }
+        }
     
     output.appendChild(new_entry);
     }
-    window.scrollBy(0, 500);
+    // window.scrollBy(0, 500);
     this.output_displayed = true;
     console.log(output);
 
@@ -663,7 +709,7 @@ function displayOutputBST(data, place) {
 
     }
     output.appendChild(new_entry);
-    window.scrollBy(0, 500);
+    // window.scrollBy(0, 500);
     this.output_displayed = true;
     console.log(output);
 
@@ -766,7 +812,7 @@ function displayOutputSchedule(data, names) {
 
 
         }
-    window.scrollBy(0, 500);
+    // window.scrollBy(0, 500);
     this.output_displayed = true;
 
 }
@@ -781,9 +827,11 @@ function submitSCHEDULE(){
     var output = [];
     var valid = true;
     payload = {};
+    loadingInterval = setInterval(loading, 250);
+    this.output_displayed = true;
+    window.scrollBy(0, 400);
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
-
         if (i != 0) {
             var entry_t = "SCHEDULE_INPUT" + i;
             var res = document.getElementById(entry_t);
@@ -869,11 +917,12 @@ function submitSCHEDULE(){
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
+                clearInterval(loadingInterval);
                 displayOutputSchedule(data, names);
             },
             statusCode: {
                 500: function() {
-
+                clearInterval(loadingInterval);
                 displayFailureMessage()
 
                 }
