@@ -28,6 +28,9 @@ class hour(object):
 
     def insert(self, location, time):
         # Check if we have space for an event at this hour, and inserts if available.
+        if time == 0:
+            #sure, i'll fit nothing here. 
+            return True
         if (self.timeleft - time) < 0:
             print("false")
             return False
@@ -200,9 +203,14 @@ class scheduleObj(object):
             return False
 
     def generate_zscore(self, location, hour, time, closedtimes, pop_times):
-
+        #print("pop times is" )
+        #print(pop_times)
         left_score = self.generate_zscore_left(location, hour-1, time, closedtimes, pop_times)
         right_score = self.generate_zscore_right(location, hour+1, time, closedtimes, pop_times)
+        #print(left_score)
+        #print(right_score)
+        if time == 0:
+            return (1, RIGHT) #it's ya boi, kludge
         if (left_score == 0) and (right_score == 0):
             # neither direction works! signal we couldn't continue.
             return (0, RIGHT)
@@ -241,11 +249,8 @@ class scheduleObj(object):
                 # we were able to insert into previous time slots; now, calculate cost of this slot.
                 return z_score + (60 * pop_times[hour])
         #We couldn't finish insertion here and cannot continue to the previous hour; failed!
-        print("what?")
         return 0
 
-        print("what?")
-        print(location + ": " + str(hour) + " " + str(time))
 
     def generate_zscore_right(self, location, hour, time, closedtimes, pop_times):
         if (hour < 0) or (hour > 23):
@@ -362,8 +367,6 @@ class scheduler(Resource):
                 resorted_dict[k][hour] = pop
                 if pop == 0:
                     closed_hours[k].append(hour)
-        for k in tempdict.keys():
-            resorted_dict[k] = sorted(tempdict[k], key = lambda pair: pair[0])
         return resorted_dict, closed_hours, sorted(tuplelist, key = lambda triple: 1000 if triple[2] == 0 else triple[2])
 
 
@@ -375,14 +378,17 @@ class scheduler(Resource):
             return 0, sched_obj
         for loc in locations:
             schedule = deepcopy(sched_obj)
+            if loc == "sentinel":
+                # we don't process this; these should be in their own tiers.
+                return 0, schedule
             best_hour_score = 144001
             best_hour = 0
             best_hour_dir = LEFT
             best_bleed = False
             for x in range(24):
-                print("for hour "+ str(x)+ ":")
-                print("pop count is "+ str(pop_dict[loc][x]))
-                print("inserting here solely costs " + str(curr_times[loc] * pop_dict[loc][x]))
+                #print("for hour "+ str(x)+ ":")
+               # print("pop count is "+ str(pop_dict[loc][x]))
+                #print("inserting here solely costs " + str(curr_times[loc] * pop_dict[loc][x]))
                 if x in closed_times[loc]:
                     #closed at this time, ignore it
                     continue
