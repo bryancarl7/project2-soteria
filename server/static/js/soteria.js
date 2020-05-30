@@ -388,19 +388,19 @@ function submitBST(){
     let entry = auto_bst.getPlace();
     var valid = true;
     if (document.getElementById("BST_INPUT").value == "" || entry == undefined) {
-        alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
+        // alert("ERROR: PLEASE ENTER A VALID PLACE BEFORE SUBMITTING")
         valid = false;
       }
-    let payload = {
-        placeId: entry.place_id,
-        location: entry.geometry.location,
-        type: entry.types
-    }
     loadingInterval = setInterval(loading, 250);
     this.output_displayed = true;
     window.scrollBy(0, 200);
 
     if (valid) {
+    let payload = {
+        placeId: entry.place_id,
+        location: entry.geometry.location,
+        type: entry.types
+    }
     $.ajax({
         url: "/times/bestTime",
         type: "POST",
@@ -423,7 +423,7 @@ function submitBST(){
     else {
 
         clearInterval(loadingInterval);
-
+        displayFailureMessage();
     }
 }
 
@@ -494,7 +494,7 @@ function submitBFT(){
             }
             }
             })
-        .catch(() => displayFailureMessage());
+        .catch(() => {clearInterval(loadingInterval); displayFailureMessage();});
 
 
 }
@@ -827,9 +827,6 @@ function submitSCHEDULE(){
     var output = [];
     var valid = true;
     payload = {};
-    loadingInterval = setInterval(loading, 250);
-    this.output_displayed = true;
-    window.scrollBy(0, 400);
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
         if (i != 0) {
@@ -881,6 +878,9 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(0);
                         if (valid_times) {
+                            loadingInterval = setInterval(loading, 250);
+                            this.output_displayed = true;
+                            window.scrollBy(0, 400);
                             // console.log(places[0]);
                             let add = {
                             placeId : places[0].place_id,
@@ -930,6 +930,9 @@ function submitSCHEDULE(){
             }
         })
 
+    }
+    else {
+        clearInterval(loadingInterval);
     }
 
 }

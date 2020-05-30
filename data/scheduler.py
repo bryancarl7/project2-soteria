@@ -453,7 +453,7 @@ class scheduler(Resource):
 
 
     @classmethod
-    def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = True):
+    def optimize_schedule(cls, schedule, day, test_dict=None, strict = False, bruteforce = True):
         '''
         Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
