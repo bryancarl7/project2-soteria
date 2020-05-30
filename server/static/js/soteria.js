@@ -8,6 +8,7 @@ function deleteRow() {
     let row = parseInt(name.substring(3));
     table.deleteRow(row);
     del_rows.splice(row-1, 1);
+
     updateIDs(row);
     updateRowDelIndexes(row);
     current_row -= 1;
@@ -18,7 +19,9 @@ function deleteRow() {
 // deleting intermediary row, must update all other rows and their ids
 
 function updateIDs(row) {
+
     for (var i = row+1; i < sched_id; i++) {
+
         let from = document.getElementById("from"+i);
         let to = document.getElementById("to"+i);
         let priority = document.getElementById("priority"+i);
@@ -26,8 +29,11 @@ function updateIDs(row) {
             from.id = 'from'+(i-1);
             to.id = 'to'+(i-1);
             priority.id = 'priority'+(i-1);
+
         }
+
     }
+
 }
 
 function updateRowDelIndexes(row) {
@@ -84,14 +90,20 @@ function checkTimesValidity() {
     times.sort(compare);
     console.log(times);
     if (times.length > 1) {
+
       for (var j = 1; j < times.length; j++) {
+
         if (times[j][0] < times[j-1][1] && times[j][0] > times[j-1][0]) {
           alert("ENTRIES OVERLAP: PLEASE MAKE SURE NONE OF YOUR ACTIVITIES OVERLAP IN TIME")
           return false;
         }
+
         }
+
     }
+
     return true;
+
 }
 
 function checkEntriesValidity() {
@@ -118,12 +130,14 @@ function checkEntriesValidity() {
              alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
+
         }
     }
     return true;
 }
 
 function checkPriorities() {
+
     var entry;
     for (var i = 0; i < sched_id; i++) {
         var entry = "priority";
@@ -133,10 +147,12 @@ function checkPriorities() {
             entry += i;
             entry_t = document.getElementById(entry);
             if (entry_t !== null) {
+
                 if (entry_t.value == "") {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
+
             }
         }
         else {
@@ -146,9 +162,13 @@ function checkPriorities() {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
+
         }
+
     }
+
     return true;
+
 }
 
 // add a priority attribute to each row
@@ -272,7 +292,7 @@ function addAutoRow() {
         $(function() {
             var new_sched_input = $("#SCHEDULE_INPUT" + sched_id)[0];
             auto_rows[current_row-1] = new google.maps.places.Autocomplete(new_sched_input);
-            auto_rows[current_row-1].setFields(['address_components', 'geometry', 'icon', 'name', 'id']);
+            auto_rows[current_row-1].setFields(['place_id', 'geometry', 'name', 'formatted_address', 'type']);
             auto_listeners[current_row-1] = auto_rows[current_row-1].addListener('place_changed', function() {
             var place = this.getPlace();
             if (!place.geometry) {
@@ -352,7 +372,7 @@ bestPlace { location:(hour, ratio)}
 */
 
 
-function submitBST(displayOutput){
+function submitBST(){
     let entry = auto_bst.getPlace();
     var valid = true;
     if (BST.value == "") {
@@ -384,35 +404,56 @@ function submitBFT(){
     var valid = true;
    //  var entry = auto_bft.getPLace()
     var entry = document.getElementById("BFT_INPUT");
+    console.log(entry.value);
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
-        let payload = {
-            type : entry.value
-        }
 
-        if (valid) {
-        $.ajax({
-            url: "/times/bestPlace",
-            type: "POST",
-            data: JSON.stringify(payload),
-            contentType: "application/json",
-            success: function(data) {
-                displayOutputBFT(data);
-            },
-            statusCode: {
-                500: function() {
 
-                displayFailureMessage()
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+        const url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs"; // site that doesn’t send Access-Control-*
+        fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
+        .then(response => response.json())
+        .then(contents => {
+            console.log(contents); 
+            let results = contents.results;
+            var placeIds = [];
+            for (var i = 0; i < 10; i++) {
+                let cur = results[i];
+                placeIds.push(cur.place_id);
+            }
+            let payload = {
+            type : placeIds
+            }
+            if (valid) {
+            $.ajax({
+                url: "/times/bestPlace",
+                type: "POST",
+                data: JSON.stringify(payload),
+                contentType: "application/json",
+                success: function(data) {
+                    console.log(data);
+                    displayOutputBFT(data);
+                },
+                statusCode: {
+                    500: function() {
+
+                    displayFailureMessage()
+
+                    }
 
                 }
-
+            });
             }
-        });
-        }
+
+            })
+        .catch(() => displayFailureMessage());
+
 
 }
+
+// need to add different failure message detailing if a location is closed or not
 
 function displayFailureMessage() {
     if (this.output_displayed) {
@@ -497,6 +538,7 @@ function getPriority(index) {
     return element.value;
 }
 
+// completely incorrect since don't know the output
 function displayOutputBFT(data) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -512,38 +554,41 @@ function displayOutputBFT(data) {
     output.appendChild(title);
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
-    for (var i = 0; i < data.length; i++) {
-
+    for (var j = 0; j < data.length; j++) {
+        let cur = data[j];
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
-        var from_time;
-        var min_from = data[i].startTime % 60;
-        var hrs_from = Math.floor(data[i].startTime / 60);
-        if (min_from < 10) {
-            let new_min_from = "0" + min_from;
-            min_from = new_min_from;
-        }
-        from_time = hrs_from + ":" + min_from;
-
-        var to_time;
-        var min_to = data[i].endTime % 60;
-        var hrs_to = Math.floor(data[i].endTime / 60);
-        if (min_to < 10) {
-            let new_min_to = "0" + min_to;
-            min_to = new_min_to;
-        }
-        to_time = hrs_to + ":" + min_to;
-        var newContent = document.createTextNode("You should go to " + data[i].place + " between " + from_time + " and " + to_time);
+        var newContent = document.createTextNode("These are the times for " + cur.name + " in order from least busy to most busy: ");
         new_entry.appendChild(newContent);
-        output.appendChild(new_entry);
+    for (var i = 0; i < cur.times.length; i++) {
+        let cur_time = cur.times[i];
+        if (cur_time[1] == 0) {
+            break;
+        }
+        if (i < 3) {
+            var bold = document.createElement("strong");
+            var newOne = document.createTextNode((i+1) + ") ");
+            var time = document.createTextNode(cur_time[0] + ":00  ");
+            bold.appendChild(time);
+            new_entry.appendChild(newOne);
+            new_entry.appendChild(bold);
 
+        }
+        else {
+        var newOne = document.createTextNode((i+1) + ") " + cur_time[0] + ":00  ");
+        new_entry.appendChild(newOne);
+        }
+
+    }
+    
+    output.appendChild(new_entry);
     }
     window.scrollBy(0, 500);
     this.output_displayed = true;
     console.log(output);
 
-
 }
+
 
 function displayOutputBST(data, place) {
     if (this.output_displayed) {
@@ -593,7 +638,9 @@ function displayOutputBST(data, place) {
 
 }
 
-function displayOutputSchedule(data) {
+
+function displayOutputSchedule(data, names) {
+    console.log(data);
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -609,12 +656,16 @@ function displayOutputSchedule(data) {
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
     for (var i = 0; i < data.length; i++) {
-
+        let current = data[i][0];
+        let name = names[i];
+        if (name != null) {
+        let startTime = current[1];
+        let endTime = current[2];
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
         var from_time;
-        var min_from = data[i].startTime % 60;
-        var hrs_from = Math.floor(data[i].startTime / 60);
+        var min_from = startTime % 60;
+        var hrs_from = Math.floor(startTime / 60);
         if (min_from < 10) {
             let new_min_from = "0" + min_from;
             min_from = new_min_from;
@@ -622,16 +673,20 @@ function displayOutputSchedule(data) {
         from_time = hrs_from + ":" + min_from;
 
         var to_time;
-        var min_to = data[i].endTime % 60;
-        var hrs_to = Math.floor(data[i].endTime / 60);
+        var min_to = endTime % 60;
+        var hrs_to = Math.floor(endTime / 60);
         if (min_to < 10) {
             let new_min_to = "0" + min_to;
             min_to = new_min_to;
         }
         to_time = hrs_to + ":" + min_to;
-        var newContent = document.createTextNode("You should go to " + data[i].place + " between " + from_time + " and " + to_time);
+        var newContent = document.createTextNode("You should go to " + name + " between " + from_time + " and " + to_time);
         new_entry.appendChild(newContent);
         output.appendChild(new_entry);
+        }
+        else {
+            break;
+        }
 
     }
     window.scrollBy(0, 500);
@@ -640,8 +695,13 @@ function displayOutputSchedule(data) {
 
 
 }
+
+
+// use getPlace() method on listeners to get ids
+
 function submitSCHEDULE(){
     // TODO
+    var names = [];
     var index = 1;
     var output = [];
     var valid = true;
@@ -658,14 +718,20 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(index);
                         if (valid_times) {
+
+
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
+                            console.log(places[i+1]);
+                            console.log(places[i]);
+                            names.push(places[i+1].name);
                             let add = {
-                            placeId : places[i+1].id,
+                            placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
                             type : places[i+1].types
                             }
+
                             payload[index] = add;
                             index += 1;
                         }
@@ -696,11 +762,12 @@ function submitSCHEDULE(){
                         if (valid_times) {
                             // console.log(places[0]);
                             let add = {
-                            placeId : places[0].id,
+                            placeId : places[0].place_id,
                             time : getTimeDifference(0),
                             priority : getPriority(0),
                             type : places[0].types
                             }
+                            names.push(places[0].name);
                             payload[0] = add;
                         }
                         else {
@@ -722,26 +789,22 @@ function submitSCHEDULE(){
     }
     if (valid) {
     console.log(payload);
+
         $.ajax({
             url: "/scheduler/update",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
-                let d = [
-                    {place: "Screen Door", startTime: 750, endTime: 880},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
-                    {place: "Yoga Studio", startTime: 600, endTime: 660},
+                displayOutputSchedule(data, names);
+            },
+            statusCode: {
+                500: function() {
 
-                ]
-                displayOutputSchedule(d);
+                displayFailureMessage()
+
+                }
+
             }
         })
 

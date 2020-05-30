@@ -15,6 +15,11 @@ number of locations to bruteforce insert into a schedule at the same time.
 Higher = more optimized lists, but much slower run speeds.
 
 '''
+PARTIAL_SCHEDULES = True
+'''
+If we end up in a position where it is impossible to schedule an event due to prior choices, alert the user if true
+crash if false
+'''
 
 
 class hour(object):
@@ -28,6 +33,9 @@ class hour(object):
 
     def insert(self, location, time):
         # Check if we have space for an event at this hour, and inserts if available.
+        if time == 0:
+            #sure, i'll fit nothing here. 
+            return True
         if (self.timeleft - time) < 0:
             print("false")
             return False
@@ -200,9 +208,14 @@ class scheduleObj(object):
             return False
 
     def generate_zscore(self, location, hour, time, closedtimes, pop_times):
-
+        #print("pop times is" )
+        #print(pop_times)
         left_score = self.generate_zscore_left(location, hour-1, time, closedtimes, pop_times)
         right_score = self.generate_zscore_right(location, hour+1, time, closedtimes, pop_times)
+        #print(left_score)
+        #print(right_score)
+        if time == 0:
+            return (1, RIGHT) #it's ya boi, kludge
         if (left_score == 0) and (right_score == 0):
             # neither direction works! signal we couldn't continue.
             return (0, RIGHT)
@@ -241,11 +254,8 @@ class scheduleObj(object):
                 # we were able to insert into previous time slots; now, calculate cost of this slot.
                 return z_score + (60 * pop_times[hour])
         #We couldn't finish insertion here and cannot continue to the previous hour; failed!
-        print("what?")
         return 0
 
-        print("what?")
-        print(location + ": " + str(hour) + " " + str(time))
 
     def generate_zscore_right(self, location, hour, time, closedtimes, pop_times):
         if (hour < 0) or (hour > 23):
@@ -362,8 +372,6 @@ class scheduler(Resource):
                 resorted_dict[k][hour] = pop
                 if pop == 0:
                     closed_hours[k].append(hour)
-        for k in tempdict.keys():
-            resorted_dict[k] = sorted(tempdict[k], key = lambda pair: pair[0])
         return resorted_dict, closed_hours, sorted(tuplelist, key = lambda triple: 1000 if triple[2] == 0 else triple[2])
 
 
@@ -375,14 +383,17 @@ class scheduler(Resource):
             return 0, sched_obj
         for loc in locations:
             schedule = deepcopy(sched_obj)
+            if loc == "sentinel":
+                # we don't process this; these should be in their own tiers.
+                return 0, schedule
             best_hour_score = 144001
             best_hour = 0
             best_hour_dir = LEFT
             best_bleed = False
             for x in range(24):
-                print("for hour "+ str(x)+ ":")
-                print("pop count is "+ str(pop_dict[loc][x]))
-                print("inserting here solely costs " + str(curr_times[loc] * pop_dict[loc][x]))
+                #print("for hour "+ str(x)+ ":")
+               # print("pop count is "+ str(pop_dict[loc][x]))
+                #print("inserting here solely costs " + str(curr_times[loc] * pop_dict[loc][x]))
                 if x in closed_times[loc]:
                     #closed at this time, ignore it
                     continue
@@ -420,8 +431,9 @@ class scheduler(Resource):
 
             if best_hour_score == 144001:
                 #unable to insert this location *at all*!!
+                #if we cannot insert here before other locations, we cannot insert it later; we *must* return now.
                 #invalid schedule; will never be considered over base
-                return 144001, None
+                return 144001, Sched_obj
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
             #print(best_hour_score)
             #print(best_hour)
@@ -441,7 +453,7 @@ class scheduler(Resource):
 
 
     @classmethod
-    def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = False):
+    def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = True):
         '''
         Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
@@ -475,6 +487,7 @@ class scheduler(Resource):
                 test_subset = {x:test_dict[x] for x in curr_locations}
             poplist, closedlist, glist = cls.build_greedy_list(curr_locations, day, test_subset)
             successful_inserts = []
+            failed_to_schedule = []
             if (strict == True) or (bruteforce == False):
                 # this algorithm is faster *and* is guaranteed to be optimal for a strict ruleset
                 # letting bruteforce == false allows for testing optimizations
@@ -495,7 +508,10 @@ class scheduler(Resource):
                 
                 # Check if we inserted everything in this priority level
                 if len(successful_inserts) != len(curr_locations):
-                    raise Exception  # TODO: better error descriptor
+                    if PARTIAL_SCHEDULES:
+                        failed_to_schedule += [x for x in curr_locations if x not in successful_inserts]
+                    else:
+                        raise Exception  # TODO: better error descriptor
             else:
                 #recursion guarantees we'll be the most optimal, within our set.
                 for x in range(0, len(curr_locations), MAX_RECURSION):
