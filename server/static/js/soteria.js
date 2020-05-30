@@ -674,7 +674,6 @@ function submitSCHEDULE(){
                             }
                             payload[index] = add;
                             index += 1;
-
                         }
                         else {
                             valid = false;
@@ -685,13 +684,11 @@ function submitSCHEDULE(){
                         valid = false;
                         break;
                     }
-
                 }
                 else {
                     alert("ERROR: PLEASE ENTER VALID PLACES BEFORE SUBMITTING");
                     valid = false;
                 }
-
             }
         }
         else {
@@ -711,7 +708,6 @@ function submitSCHEDULE(){
                             type : places[0].types
                             }
                             payload[0] = add;
-
                         }
                         else {
                             valid = false;
@@ -728,14 +724,13 @@ function submitSCHEDULE(){
                     valid = false;
                 }
             }
-
         }
     }
     if (valid) {
     console.log(payload);
 
         $.ajax({
-            url: "/times/bestTime",
+            url: "/scheduler/update",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
