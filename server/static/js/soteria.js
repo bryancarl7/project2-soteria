@@ -448,10 +448,12 @@ function submitBFT(){
             }
 
             })
-        .catch(() => console.log("Can’t access " + url + " response. Blocked by browser?"));
+        .catch(() => displayFailureMessage());
 
 
 }
+
+// need to add different failure message detailing if a location is closed or not
 
 function displayFailureMessage() {
     if (this.output_displayed) {
@@ -556,27 +558,26 @@ function displayOutputBFT(data) {
         let cur = data[j];
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
-        var newContent = document.createTextNode("These are the times for " + cur.location + " in order from least busy to most busy: ");
+        var newContent = document.createTextNode("These are the times for " + cur.name + " in order from least busy to most busy: ");
         new_entry.appendChild(newContent);
-    for (var i = 0; i < data.length; i++) {
-
-        if (data[i][1] == 0) {
+    for (var i = 0; i < cur.times.length; i++) {
+        let cur_time = cur.times[i];
+        if (cur_time[1] == 0) {
             break;
         }
         if (i < 3) {
             var bold = document.createElement("strong");
             var newOne = document.createTextNode((i+1) + ") ");
-            var time = document.createTextNode(data[i][0] + ":00  ");
+            var time = document.createTextNode(cur_time[0] + ":00  ");
             bold.appendChild(time);
             new_entry.appendChild(newOne);
             new_entry.appendChild(bold);
 
         }
         else {
-        var newOne = document.createTextNode((i+1) + ") " + data[i][0] + ":00  ");
+        var newOne = document.createTextNode((i+1) + ") " + cur_time[0] + ":00  ");
         new_entry.appendChild(newOne);
         }
-
 
     }
     
