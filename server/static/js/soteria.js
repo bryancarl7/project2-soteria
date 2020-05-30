@@ -376,7 +376,18 @@ function loading() {
     if (loopItem == 3) {
         loopItem = 0;
     }
-    document.getElementById("OUTPUT").innerHTML = "<span style='color: blue; font-weight: bolder;'>Loading" + dots[loopItem] + "</span>";
+    var container = document.createElement("span");
+    var text = document.createTextNode("Loading" + dots[loopItem]);
+    container.appendChild(text);
+    container.style.color = "blue";
+    var title = document.createElement("HEADER");
+    var y = document.createElement("H2");
+    y.appendChild(container);
+    title.appendChild(y);
+    document.getElementById("OUTPUT").innerHTML = "";
+    document.getElementById("OUTPUT").appendChild(title);
+    console.log(document.getElementById("OUTPUT"));
+    // document.getElementById("OUTPUT").innerHTML = "<span style='color: blue; font-weight: bolder;'>Loading" + dots[loopItem] + "</span>";
 
 }
 
@@ -719,6 +730,7 @@ function displayOutputBST(data, place) {
 // need to test clicking submit a bunch of times 
 function displayOutputSchedule(data, names) {
     console.log(data);
+    console.log("CALLING DISPLAY SCHEDULE NOW");
     console.log(this.output_displayed)
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -827,6 +839,9 @@ function submitSCHEDULE(){
     var output = [];
     var valid = true;
     payload = {};
+    loadingInterval = setInterval(loading, 250);
+    this.output_displayed = true;
+    window.scrollBy(0, 400);
     for (var i = 0; i < sched_id; i++) {
         var entry = "SCHEDULE_INPUT";
         if (i != 0) {
@@ -878,9 +893,6 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(0);
                         if (valid_times) {
-                            loadingInterval = setInterval(loading, 250);
-                            this.output_displayed = true;
-                            window.scrollBy(0, 400);
                             // console.log(places[0]);
                             let add = {
                             placeId : places[0].place_id,
