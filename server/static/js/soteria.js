@@ -8,7 +8,6 @@ function deleteRow() {
     let row = parseInt(name.substring(3));
     table.deleteRow(row);
     del_rows.splice(row-1, 1);
-
     updateIDs(row);
     updateRowDelIndexes(row);
     current_row -= 1;
@@ -19,9 +18,7 @@ function deleteRow() {
 // deleting intermediary row, must update all other rows and their ids
 
 function updateIDs(row) {
-
     for (var i = row+1; i < sched_id; i++) {
-
         let from = document.getElementById("from"+i);
         let to = document.getElementById("to"+i);
         let priority = document.getElementById("priority"+i);
@@ -29,11 +26,8 @@ function updateIDs(row) {
             from.id = 'from'+(i-1);
             to.id = 'to'+(i-1);
             priority.id = 'priority'+(i-1);
-
         }
-
     }
-
 }
 
 function updateRowDelIndexes(row) {
@@ -90,20 +84,14 @@ function checkTimesValidity() {
     times.sort(compare);
     console.log(times);
     if (times.length > 1) {
-
       for (var j = 1; j < times.length; j++) {
-
         if (times[j][0] < times[j-1][1] && times[j][0] > times[j-1][0]) {
           alert("ENTRIES OVERLAP: PLEASE MAKE SURE NONE OF YOUR ACTIVITIES OVERLAP IN TIME")
           return false;
         }
-
         }
-
     }
-
     return true;
-
 }
 
 function checkEntriesValidity() {
@@ -130,14 +118,12 @@ function checkEntriesValidity() {
              alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
-
         }
     }
     return true;
 }
 
 function checkPriorities() {
-
     var entry;
     for (var i = 0; i < sched_id; i++) {
         var entry = "priority";
@@ -147,12 +133,10 @@ function checkPriorities() {
             entry += i;
             entry_t = document.getElementById(entry);
             if (entry_t !== null) {
-
                 if (entry_t.value == "") {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
-
             }
         }
         else {
@@ -162,13 +146,9 @@ function checkPriorities() {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
-
         }
-
     }
-
     return true;
-
 }
 
 // add a priority attribute to each row
@@ -258,6 +238,8 @@ function insertRow(delete_function) {
 
 function displayMode(evt, mode) {
     var i, tabcontent, tablinks;
+    document.getElementById("OUTPUT").innerHTML = "";
+    this.output_displayed = false;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
@@ -380,7 +362,7 @@ function submitBST(displayOutput){
     let payload = {
         placeId: entry.place_id,
         location: entry.geometry.location,
-        type: entry.type
+        type: entry.types
     }
     let output = document.getElementById("BST_OUTPUT");
 
@@ -391,7 +373,7 @@ function submitBST(displayOutput){
         data: JSON.stringify(payload),
         contentType: "application/json",
         success: function(data) {
-            displayOutput(data, 'BST');
+            displayOutputBST(data, entry.name);
         }
     })
     }
@@ -400,13 +382,14 @@ function submitBST(displayOutput){
 function submitBFT(){
     // TODO
     var valid = true;
-    var entry = auto_bft.getPLace()
+   //  var entry = auto_bft.getPLace()
+    var entry = document.getElementById("BFT_INPUT");
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
         let payload = {
-            "type" : entry.name
+            type : entry.value
         }
 
         if (valid) {
@@ -416,13 +399,36 @@ function submitBFT(){
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
-                displayOutput(data, 'BST');
+                displayOutputBFT(data);
+            },
+            statusCode: {
+                500: function() {
+
+                displayFailureMessage()
+
+                }
+
             }
         });
         }
 
 }
 
+function displayFailureMessage() {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for that place / type");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    this.output_displayed = true;
+}
 
 function validTimeDifference(index) {
     var to = "to";
@@ -491,13 +497,112 @@ function getPriority(index) {
     return element.value;
 }
 
-function displayOutput(data, type) {
-
+function displayOutputBFT(data) {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
     var output = document.getElementById("OUTPUT");
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode(type + " Output");
+    var t = document.createTextNode("Best Single Time Output");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    // var title = document.createElement("HEADER");
+    // title.innerHTML = type;
+    for (var i = 0; i < data.length; i++) {
+
+        var new_entry = document.createElement("div");
+        new_entry.class = "relative";
+        var from_time;
+        var min_from = data[i].startTime % 60;
+        var hrs_from = Math.floor(data[i].startTime / 60);
+        if (min_from < 10) {
+            let new_min_from = "0" + min_from;
+            min_from = new_min_from;
+        }
+        from_time = hrs_from + ":" + min_from;
+
+        var to_time;
+        var min_to = data[i].endTime % 60;
+        var hrs_to = Math.floor(data[i].endTime / 60);
+        if (min_to < 10) {
+            let new_min_to = "0" + min_to;
+            min_to = new_min_to;
+        }
+        to_time = hrs_to + ":" + min_to;
+        var newContent = document.createTextNode("You should go to " + data[i].place + " between " + from_time + " and " + to_time);
+        new_entry.appendChild(newContent);
+        output.appendChild(new_entry);
+
+    }
+    window.scrollBy(0, 500);
+    this.output_displayed = true;
+    console.log(output);
+
+
+}
+
+function displayOutputBST(data, place) {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode("Best Single Time Output");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    // var title = document.createElement("HEADER");
+    // title.innerHTML = type;
+    var new_entry = document.createElement("div");
+    new_entry.class = "relative";
+    var newContent = document.createTextNode("These are the times for " + place + " in order from least busy to most busy: ");
+    new_entry.appendChild(newContent);
+    for (var i = 0; i < data.length; i++) {
+
+        if (data[i][1] == 0) {
+            break;
+        }
+        if (i < 3) {
+            var bold = document.createElement("strong");
+            var newOne = document.createTextNode((i+1) + ") ");
+            var time = document.createTextNode(data[i][0] + ":00  ");
+            bold.appendChild(time);
+            new_entry.appendChild(newOne);
+            new_entry.appendChild(bold);
+
+        }
+        else {
+        var newOne = document.createTextNode((i+1) + ") " + data[i][0] + ":00  ");
+        new_entry.appendChild(newOne);
+        }
+
+
+    }
+    output.appendChild(new_entry);
+    window.scrollBy(0, 500);
+    this.output_displayed = true;
+    console.log(output);
+
+
+}
+
+function displayOutputSchedule(data) {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode("Scheduler Output");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
@@ -553,19 +658,16 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(index);
                         if (valid_times) {
-
-
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
                             let add = {
-                            "place" : places[i+1].id,
-                            "time" : getTimeDifference(index),
-                            "priority" : getPriority(index),
-                            "types" : places[i+1].types
+                            placeId : places[i+1].id,
+                            time : getTimeDifference(index),
+                            priority : getPriority(index),
+                            type : places[i+1].types
                             }
                             payload[index] = add;
                             index += 1;
-
                         }
                         else {
                             valid = false;
@@ -576,13 +678,11 @@ function submitSCHEDULE(){
                         valid = false;
                         break;
                     }
-
                 }
                 else {
                     alert("ERROR: PLEASE ENTER VALID PLACES BEFORE SUBMITTING");
                     valid = false;
                 }
-
             }
         }
         else {
@@ -596,13 +696,12 @@ function submitSCHEDULE(){
                         if (valid_times) {
                             // console.log(places[0]);
                             let add = {
-                            "place" : places[0].id,
-                            "time" : getTimeDifference(0),
-                            "priority" : getPriority(0),
-                            "types" : places[0].types
+                            placeId : places[0].id,
+                            time : getTimeDifference(0),
+                            priority : getPriority(0),
+                            type : places[0].types
                             }
                             payload[0] = add;
-
                         }
                         else {
                             valid = false;
@@ -619,14 +718,12 @@ function submitSCHEDULE(){
                     valid = false;
                 }
             }
-
         }
     }
     if (valid) {
     console.log(payload);
-
         $.ajax({
-            url: "/times/bestTime",
+            url: "/scheduler/update",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
@@ -644,7 +741,7 @@ function submitSCHEDULE(){
                     {place: "Yoga Studio", startTime: 600, endTime: 660},
 
                 ]
-                displayOutput(d, 'Scheduler');
+                displayOutputSchedule(d);
             }
         })
 
