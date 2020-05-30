@@ -15,6 +15,11 @@ number of locations to bruteforce insert into a schedule at the same time.
 Higher = more optimized lists, but much slower run speeds.
 
 '''
+PARTIAL_SCHEDULES = True
+'''
+If we end up in a position where it is impossible to schedule an event due to prior choices, alert the user if true
+crash if false
+'''
 
 
 class hour(object):
@@ -426,8 +431,9 @@ class scheduler(Resource):
 
             if best_hour_score == 144001:
                 #unable to insert this location *at all*!!
+                #if we cannot insert here before other locations, we cannot insert it later; we *must* return now.
                 #invalid schedule; will never be considered over base
-                return 144001, None
+                return 144001, Sched_obj
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
             #print(best_hour_score)
             #print(best_hour)
@@ -447,7 +453,7 @@ class scheduler(Resource):
 
 
     @classmethod
-    def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = False):
+    def optimize_schedule(cls, schedule, day, test_dict=None, strict = True, bruteforce = True):
         '''
         Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
@@ -481,6 +487,7 @@ class scheduler(Resource):
                 test_subset = {x:test_dict[x] for x in curr_locations}
             poplist, closedlist, glist = cls.build_greedy_list(curr_locations, day, test_subset)
             successful_inserts = []
+            failed_to_schedule = []
             if (strict == True) or (bruteforce == False):
                 # this algorithm is faster *and* is guaranteed to be optimal for a strict ruleset
                 # letting bruteforce == false allows for testing optimizations
@@ -501,7 +508,10 @@ class scheduler(Resource):
                 
                 # Check if we inserted everything in this priority level
                 if len(successful_inserts) != len(curr_locations):
-                    raise Exception  # TODO: better error descriptor
+                    if PARTIAL_SCHEDULES:
+                        failed_to_schedule += [x for x in curr_locations if x not in successful_inserts]
+                    else:
+                        raise Exception  # TODO: better error descriptor
             else:
                 #recursion guarantees we'll be the most optimal, within our set.
                 for x in range(0, len(curr_locations), MAX_RECURSION):
