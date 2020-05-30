@@ -52,7 +52,8 @@ class BusyTimesReporter():
         def has_value(cls, value):
             return value in cls._value2member_map_
 
-    def get_api_key():
+    @classmethod
+    def get_api_key(cls):
         """
         Returns the Google Maps API Key as specified in the 'credentials.ini'
         file (see README.md for more details).
@@ -85,18 +86,19 @@ class BusyTimesReporter():
         return API_KEY
 
     @classmethod
-    def get_busy_times(cls, location, mode, place_type):
+    def get_busy_times(cls, location, mode, place_types=[]):
         """
         Returns a set of intervals representing the busy times of a location.
 
         Arguments:
             location    (String)                        - Google Maps Place ID
             mode        (Int or BusyTimesReporter.Mode) - Fetching Mode
-            place_type  (String)                        - Use to in simulation mode
+            place_types (String List)                   - Use to in simulation mode
         Returns:
             Dictionary                                  - Busy Time Intervals
                 Key     (String)                        - Day of the Week
                 Value   (Int List)                      - Hour Occupancy Ratios
+            Boolean                                     - True iff simulated mode inaccurate
         Raises:
             TypeError                                   - Bad argument type
             ValueError                                  - Bad argument value
@@ -111,8 +113,11 @@ class BusyTimesReporter():
             raise ValueError("argument 'mode' is invalid")
         if not isinstance(location, str):
             raise TypeError("argument 'location' must be of type str")
-        if not isinstance(place_type, str):
-            raise TypeError("argument 'place_type' must be of type str")
+        if not isinstance(place_types, list):
+            raise TypeError("argument 'place_types' must be of type list")
+        for item in place_types:
+            if not isinstance(item, str):
+                raise TypeError("argument 'place_types' contains at least one entry that is not a string")
 
         # Standardize input
         if isinstance(mode, int):
@@ -123,11 +128,12 @@ class BusyTimesReporter():
         gmaps = googlemaps.Client(key=API_KEY)
 
         busy_times = None
+        INACCURATE_FLAG = False
 
         if mode == cls.Mode.ACCURATE:
             # Setup return
-            DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-                    "Saturday", "Sunday")
+            DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+                    "Saturday", "Sunday"]
             busy_times = dict.fromkeys(DAYS)
             result = None
 
@@ -172,6 +178,7 @@ class BusyTimesReporter():
 
                 busy_times[entry["name"]] = entry["data"]
         else:
-            busy_times = SimulationManager.get_busy_times(place_type)
-
-        return busy_times
+            busy_times, flag = SimulationManager.get_busy_times(place_types)
+            INACCURATE_FLAG = flag
+        print(busy_times)
+        return busy_times, INACCURATE_FLAG

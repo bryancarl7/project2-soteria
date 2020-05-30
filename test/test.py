@@ -150,7 +150,7 @@ class SimulationManagerTests(unittest.TestCase):
             ]
         for case in cases:
             print(f"\tChecking type {case}")
-            observed = SimulationManager.get_busy_times(case)
+            observed, flag = SimulationManager.get_busy_times(case)
             expected = expected_results[cases.index(case)]
             self.assertEqual(observed, expected)
 
@@ -170,7 +170,8 @@ class BusyTimesReporterTests(unittest.TestCase):
         for location in locations:
             for mode in modeType:
                 print("Checking for location:", location, ", mode type:", mode)
-                result = BusyTimesReporter.get_busy_times(location, mode, "restaurant")
+                result, flag = BusyTimesReporter.get_busy_times(location, mode, ["restauran"])
+                print(f"Flag {flag}")
                 if mode == BusyTimesReporter.Mode.SIMULATED: # Change when simulated working
                     result = True
                 self.assertIsNotNone(result)

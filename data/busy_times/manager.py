@@ -3,7 +3,7 @@ manager.py
 
 ===============================================================================
 
-Last Modified: 23 May 2020
+Last Modified: 29 May 2020
 Modification By: Carter Perkins
 
 Creation Date: 22 May 2020
@@ -31,18 +31,19 @@ class SimulationManager():
              path + "store.csv")
 
     @classmethod
-    def get_busy_times(cls, location_type):
+    def get_busy_times(cls, location_types):
         """
         Returns the simulated busy time interval for a location type.
 
         Arguments:
-            location_type   (String)        - Location Type
+            location_types  (List String)   - Location Type
         Returns:
             Dictionary                      - Busy Time Intervals
                 Key         (String)        - Day of the Week
                 Value       (Int List)      - Hour Occupancy Ratios
+            Boolean                         - True if matching inaccurate
         Raises:
-            ValueError                      - location_type invalid
+            ValueError                      - location_types invalid
             FileNotFoundError               - Missing simulated data file(s)
         """
 
@@ -53,10 +54,7 @@ class SimulationManager():
                                 "supermarket": cls.files[1],
                                 "park": cls.files[2]}
 
-        # Validate input
-        if location_type not in valid_location_types:
-            raise ValueError("argument 'location_type' is invalid")
-
+        # Validate data files
         BASE_DIR = os.path.dirname(os.path.realpath(__file__))
         for dataset in cls.files:
             if not os.path.isfile(f"{BASE_DIR}{dataset}"):
@@ -64,6 +62,36 @@ class SimulationManager():
 
         DAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         result = dict.fromkeys(DAYS)
+
+        # Choose best fitting location type
+        order = ("park", "restaurant", "supermarket", "store") # Store default case when no match
+        determinant = {
+            # Types that map to park
+            "park": "park",
+            # Types that map to restaurant
+            "food": "restuarant",
+            "restaurant": "restaurant",
+            # Types that map to supermarket
+            "supermarket": "supermarket",
+            # Types that map to store
+            "store": "store",
+            "establishment": "store"
+        }
+        location_type = None
+        INACCURATE_FLAG = False
+        for item in order:
+            # Search by priority for first matching type
+            if item in location_types:
+                location_type = item
+                break
+        if not location_type:
+            # Try searching by location type next
+            for item in location_types:
+                if item in determinant:
+                    location_type = determinant[item]
+                    break
+            INACCURATE_FLAG = True
+            location_type = "store" # default case
 
         # Read simulated data
         path = BASE_DIR + valid_location_types[location_type]
@@ -77,4 +105,4 @@ class SimulationManager():
                 except ValueError:
                     raise TypeError(f"malformed {path}")
 
-        return result
+        return result, INACCURATE_FLAG

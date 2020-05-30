@@ -1,7 +1,6 @@
-import requests
 from data.apiHandler import apiKeyLoader
-from flask_restful import Resource
-from collections import OrderedDict
+from flask_restful import Resource, request
+import datetime, calendar, json
 from data.bestPlace import bestPlace
 from copy import deepcopy
 
@@ -310,29 +309,20 @@ class scheduleObj(object):
         return zscore
 
 
-
-
-
-
-
-
 class scheduler(Resource):
-    def __init__(self):
-        self.apiHandler = apiKeyLoader()
-        self.id = ""
-        self.table = []
-
-    def get(self):
-        return '', 200
-
     def post(self):
-        return '', 200
+        # Take the JSON from the request
+        json_dump = request.get_json()
+        print(json.dumps(json_dump, indent=4))
 
-    def delete(self):
-        return '', 200
+        # Setup Place_ID
+        place_id = json_dump['place']  # add extra indexes to the end to sub-index the JSON
 
-    def create(self):
-        return '', 200
+        # Setup the day of the week
+        today = datetime.datetime.today()
+        day = calendar.day_name[today.weekday()]
+
+        return place_id, 200
     
     @staticmethod
     def build_greedy_list(curr_locations, day, test_dict = None):
@@ -444,7 +434,7 @@ class scheduler(Resource):
         User-defined priority represents the order to select places: Users are asked to rate places with higher average customers closer to 1
         '''
         sched = scheduleObj(strict)
-        #build a list of priorities; the sentinel guarantees the last priority is run through the following loop.
+        #builds a list of priorities; the sentinel guarantees the last priority is run through the following loop.
         by_priority = sorted(schedule.items(), key = lambda pair: pair[1][0])
         sentinel = ("dummy", (999,999))
         by_priority.append(sentinel)

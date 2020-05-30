@@ -7,10 +7,11 @@ credentials.json
 # C extensions
 *.so
 
+.DS_Store
+
 # Distribution / packaging
 .Python
 .idea/
-build/
 develop-eggs/
 dist/
 downloads/
@@ -62,6 +63,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+.DS_Store
 
 # Flask stuff:
 instance/
