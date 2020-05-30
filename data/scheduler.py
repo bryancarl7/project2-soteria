@@ -327,13 +327,15 @@ class scheduler(Resource):
             id = json_dump[str(ctr)]['placeId']
             time = json_dump[str(ctr)]['time']
             prio = json_dump[str(ctr)]['priority']
+            print(id, time, prio)
 
             # Store the entry we created
             entry = (prio, time)
             entries[id] = entry
+            ctr += 1
 
         # Process the list
-        built = self.build_greed_list(entries, day)
+        built = self.optimize_schedule(entries, day)
         return built, 200
     
     @staticmethod

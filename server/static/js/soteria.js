@@ -8,7 +8,6 @@ function deleteRow() {
     let row = parseInt(name.substring(3));
     table.deleteRow(row);
     del_rows.splice(row-1, 1);
-
     updateIDs(row);
     updateRowDelIndexes(row);
     current_row -= 1;
@@ -19,9 +18,7 @@ function deleteRow() {
 // deleting intermediary row, must update all other rows and their ids
 
 function updateIDs(row) {
-
     for (var i = row+1; i < sched_id; i++) {
-
         let from = document.getElementById("from"+i);
         let to = document.getElementById("to"+i);
         let priority = document.getElementById("priority"+i);
@@ -29,11 +26,8 @@ function updateIDs(row) {
             from.id = 'from'+(i-1);
             to.id = 'to'+(i-1);
             priority.id = 'priority'+(i-1);
-
         }
-
     }
-
 }
 
 function updateRowDelIndexes(row) {
@@ -90,20 +84,14 @@ function checkTimesValidity() {
     times.sort(compare);
     console.log(times);
     if (times.length > 1) {
-
       for (var j = 1; j < times.length; j++) {
-
         if (times[j][0] < times[j-1][1] && times[j][0] > times[j-1][0]) {
           alert("ENTRIES OVERLAP: PLEASE MAKE SURE NONE OF YOUR ACTIVITIES OVERLAP IN TIME")
           return false;
         }
-
         }
-
     }
-
     return true;
-
 }
 
 function checkEntriesValidity() {
@@ -130,14 +118,12 @@ function checkEntriesValidity() {
              alert("ERROR: PLEASE ENTER VALID TIMES BEFORE ADDING MORE ROWS");
              return false;
             }
-
         }
     }
     return true;
 }
 
 function checkPriorities() {
-
     var entry;
     for (var i = 0; i < sched_id; i++) {
         var entry = "priority";
@@ -147,12 +133,10 @@ function checkPriorities() {
             entry += i;
             entry_t = document.getElementById(entry);
             if (entry_t !== null) {
-
                 if (entry_t.value == "") {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
-
             }
         }
         else {
@@ -162,13 +146,9 @@ function checkPriorities() {
                 alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");
                 return false;
             }
-
         }
-
     }
-
     return true;
-
 }
 
 // add a priority attribute to each row
@@ -662,12 +642,10 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(index);
                         if (valid_times) {
-
-
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
                             let add = {
-                            placeID : places[i+1].id,
+                            placeId : places[i+1].id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
                             type : places[i+1].types
@@ -728,7 +706,6 @@ function submitSCHEDULE(){
     }
     if (valid) {
     console.log(payload);
-
         $.ajax({
             url: "/scheduler/update",
             type: "POST",
