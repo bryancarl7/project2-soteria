@@ -166,14 +166,26 @@ class scheduler(Resource):
         json_dump = request.get_json()
         print(json.dumps(json_dump, indent=4))
 
-        # Setup Place_ID
-        place_id = json_dump['place']  # add extra indexes to the end to sub-index the JSON
-
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
 
-        return place_id, 200
+        entries = {}
+        length = len(json_dump)
+        ctr = 0
+        while ctr < length:
+            # Load up our entry
+            id = json_dump[str(ctr)]['placeId']
+            time = json_dump[str(ctr)]['time']
+            prio = json_dump[str(ctr)]['priority']
+
+            # Store the entry we created
+            entry = (prio, time)
+            entries[id] = entry
+
+        # Process the list
+        built = self.build_greed_list(entries, day)
+        return built, 200
     
     @staticmethod
     def build_greedy_list(curr_locations, day, test_dict = None):
