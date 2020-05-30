@@ -372,7 +372,7 @@ bestPlace { location:(hour, ratio)}
 */
 
 
-function submitBST(displayOutput){
+function submitBST(){
     let entry = auto_bst.getPlace();
     var valid = true;
     if (BST.value == "") {
@@ -404,10 +404,41 @@ function submitBFT(){
     var valid = true;
    //  var entry = auto_bft.getPLace()
     var entry = document.getElementById("BFT_INPUT");
+    console.log(entry.value);
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
+    var request = {
+        query: entry.value,
+        fields: ['name', 'id', 'geometry']
+    }
+    console.log("Here");
+        var service = new google.maps.places.AutocompleteService();
+        console.log("here");
+        service.getQueryPredictions({ input: entry.value}, function(predictions, status) {
+            console.log(status);
+            console.log(predictions);
+        });
+        $.ajax({
+            url: "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs",
+            type: "GET",
+            // data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function(data) {
+                console.log(data);
+            },
+            statusCode: {
+                500: function() {
+
+                // displayFailureMessage()
+
+                }
+
+            }
+        });
+        
+
         let payload = {
             type : entry.value
         }
@@ -565,6 +596,7 @@ function displayOutputBFT(data) {
 
 }
 
+
 function displayOutputBST(data, place) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -613,6 +645,7 @@ function displayOutputBST(data, place) {
 
 }
 
+
 function displayOutputSchedule(data) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -660,6 +693,10 @@ function displayOutputSchedule(data) {
 
 
 }
+
+
+// use getPlace() method on listeners to get ids
+
 function submitSCHEDULE(){
     // TODO
     var index = 1;
