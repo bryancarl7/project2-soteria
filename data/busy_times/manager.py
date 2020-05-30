@@ -61,7 +61,9 @@ class SimulationManager():
             if not os.path.isfile(f"{BASE_DIR}{dataset}"):
                 raise FileNotFoundError(f"{BASE_DIR}{dataset}")
 
-        DAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        DAYS = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        CSV_HEADERS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        HEADER_TO_DAYS = {header : day for header, day in zip(CSV_HEADERS, DAYS)}
         result = dict.fromkeys(DAYS)
 
         # Choose best fitting location type
@@ -100,9 +102,9 @@ class SimulationManager():
             csvreader = csv.reader(csvfile, delimiter=",")
             for row in csvreader:
                 try:
-                    if row[0] not in DAYS:
+                    if row[0] not in CSV_HEADERS:
                         raise TypeError(f"malformed {path}")
-                    result[row[0]] = list(map(int, row[1:]))
+                    result[HEADER_TO_DAYS[row[0]]] = list(map(int, row[1:]))
                 except ValueError:
                     raise TypeError(f"malformed {path}")
 
