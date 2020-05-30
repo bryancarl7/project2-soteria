@@ -123,9 +123,9 @@ class scheduleObj(object):
     '''
     def __init__(self, STRICT = True):
         self.strict = STRICT
-        self.hours = {}
+        self.hours = []
         for x in range(24):
-            self.hours[x] = hour(x)
+            self.hours.append(hour(x))
 
     def insert(self, location, hour, time, closedtimes, pop_times, direction = None):
         print("attempting insert of place " + location + " at hour " + str(hour) + " with duration " + str(time), end='.')
@@ -281,7 +281,7 @@ class scheduleObj(object):
 
     def to_list(self):
         internal = []
-        for x in range(1, 23):
+        for x in range(0, 23):
             cur = self.hours[x].as_minutes()
             if(len(cur) == 0):
                 continue
@@ -354,12 +354,14 @@ class scheduler(Resource):
         tempdict = bestPlace.get_best_place(curr_locations, day, test_dict)
         tuplelist = []
         closed_hours = {x:[] for x in curr_locations}
+        resorted_dict = {}
         for k in tempdict.keys():
+            resorted_dict[k] = [0 for x in range(24)]
             for hour, pop in tempdict[k]:
                 tuplelist.append( (k, hour, pop) )
+                resorted_dict[k][hour] = pop
                 if pop == 0:
                     closed_hours[k].append(hour)
-        resorted_dict = {}
         for k in tempdict.keys():
             resorted_dict[k] = sorted(tempdict[k], key = lambda pair: pair[0])
         return resorted_dict, closed_hours, sorted(tuplelist, key = lambda triple: 1000 if triple[2] == 0 else triple[2])
@@ -369,6 +371,8 @@ class scheduler(Resource):
     def bruteforce_helper(cls, sched_obj, locations, curr_times, closed_times,  pop_dict):
         lowest_score = 144001 # zscore = popularity in hour * minutes in the slot, max = 24 * 60 * 100 = 144000.
         final_schedule = None
+        if len(locations) == 0:
+            return 0, sched_obj
         for loc in locations:
             schedule = deepcopy(sched_obj)
             best_hour_score = 144001
@@ -405,11 +409,11 @@ class scheduler(Resource):
                     continue
                 score += part_score
 
-                print("score is " + str(score))
+                #print("score is " + str(score))
                 if score < best_hour_score:
-                    print("and was better than previous: " + str(best_hour_score) + " at "+ str(best_hour))
+                    #print("and was better than previous: " + str(best_hour_score) + " at "+ str(best_hour))
                     best_hour_score = score
-                    print(best_hour_score)
+                    #print(best_hour_score)
                     best_hour = x
                     best_hour_dir = direction
                     best_bleed = Must_bleed
@@ -419,13 +423,11 @@ class scheduler(Resource):
                 #invalid schedule; will never be considered over base
                 return 144001, None
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
-            print(best_hour_score)
-            print(best_hour)
+            #print(best_hour_score)
+            #print(best_hour)
             #insert's logic handles shifts
-            schedule.insert(loc, best_hour, curr_times[loc], closed_times[loc], pop_dict[loc], best_hour_dir)
-            if(len(locations) == 1):
-                #only us, return
-                return score, schedule
+            truth = schedule.insert(loc, best_hour, curr_times[loc], closed_times[loc], pop_dict[loc], best_hour_dir)
+
             #otherwise, recurse
             rec_score, rec_schedule = cls.bruteforce_helper(schedule, [x for x in locations if x != loc], curr_times, closed_times, pop_dict)
             best_hour_score += rec_score
@@ -498,17 +500,21 @@ class scheduler(Resource):
                 #recursion guarantees we'll be the most optimal, within our set.
                 for x in range(0, len(curr_locations), MAX_RECURSION):
                     loc_subset = curr_locations[x:x+MAX_RECURSION]
-                    self.bruteforce_helper(sched, loc_subset, curr_times, closedlist, poplist)
+                    cost, sched = cls.bruteforce_helper(sched, loc_subset, curr_times, closedlist, poplist)
 
             # Previous priority has been handled, setup new priority
             curr_priority = priority
             curr_locations = [key] 
             curr_times = {key: time}
         schedlist = sched.to_list()
-        failed_to_schedule = schedule.keys()
+        failed_to_schedule = []
+ 
         if len(schedlist) < len(schedule):
-            for loc, start, end in schedlist:
+            failed_to_schedule = list(schedule)
+            for x in schedlist:
+                loc = x[0]
+                print(loc)
                 if loc in failed_to_schedule:
                     failed_to_schedule.remove(loc)
-        return schedlist, failed_to_schedule
+        return sched.to_list(), failed_to_schedule
 
