@@ -68,7 +68,7 @@ class bestTime(Resource):
             times = result[day] #get the info, and then strip out what we need
         
         outlist = sorted(zip(hours, times), key=lambda pair: 1000 if pair[1] == 0 else pair[1] )
-        return outlist, flag
+        return outlist, flag.value
 
 
 
