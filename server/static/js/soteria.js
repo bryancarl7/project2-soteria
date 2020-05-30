@@ -88,7 +88,6 @@ function checkTimesValidity() {
         }
     }
     times.sort(compare);
-    console.log(times);
     if (times.length > 1) {
 
       for (var j = 1; j < times.length; j++) {
@@ -839,6 +838,8 @@ function submitSCHEDULE(){
     var output = [];
     var valid = true;
     payload = {};
+    let all_times_valid = checkTimesValidity();
+    if (all_times_valid) {
     loadingInterval = setInterval(loading, 250);
     this.output_displayed = true;
     window.scrollBy(0, 400);
@@ -946,5 +947,5 @@ function submitSCHEDULE(){
     else {
         clearInterval(loadingInterval);
     }
-
+    }
 }
