@@ -433,7 +433,7 @@ class scheduler(Resource):
                 #unable to insert this location *at all*!!
                 #if we cannot insert here before other locations, we cannot insert it later; we *must* return now.
                 #invalid schedule; will never be considered over base
-                return 144001, Sched_obj
+                return 144001, sched_obj
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
             #print(best_hour_score)
             #print(best_hour)
