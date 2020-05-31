@@ -57,20 +57,33 @@ class ServerTests(unittest.TestCase):
         print("=" * 80)
         print("Testing that all web resources are accessible...")
         routes = ("/times/bestTime", "/times/bestPlace", "/scheduler/update")
-        methods = (("GET with Request", "POST"), ("GET with Request",), ("GET", "POST"))
+        methods = ("POST", "POST", "POST")
         with app.test_client() as client:
-            for route, method in zip(routes, methods):
-                print(f"\tChecking resource {route} via HTTP {method}")
+            for route in routes:
+                print(f"\tChecking resource {route}")
                 response = None
-                for m in method:
-                    if m == "GET":
-                        response = client.get(route)
-                    elif m == "POST":
-                        response = client.post(route)
-                    elif m == "GET with Request":
-                        # TODO: Handle request on GET
-                        response = client.get("/") # replace with route and request
-                    self.assertEqual(response.status_code, 200)
+                if route == "/scheduler/update":
+                    response = client.post(route, json= {
+                        "0": {
+                         "placeId": "ChIJueDG4u99hYARsvNODbmw8UQ",
+                         "time": 120,
+                         "priority": "1",
+                        "location": {
+                             "lat": 0,
+                             "lng": 0
+                         }}})
+                elif route == "/times/bestPlace":
+                    response = client.post(route, json={
+                        "type": ["ChIJueDG4u99hYARsvNODbmw8UQ"]
+                    })
+                else:
+                    response = client.post(route, json={
+                        "placeId": "ChIJueDG4u99hYARsvNODbmw8UQ",
+                        "location": {
+                            "lat": 0,
+                            "lng": 0
+                        }})
+                self.assertEqual(response.status_code, 200)
 
 # Need to discuss:
 # TODO: use unittest.mock when using requests OR Flask app.test_client()
