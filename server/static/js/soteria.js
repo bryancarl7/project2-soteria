@@ -411,6 +411,8 @@ function submitBST(){
         location: entry.geometry.location,
         type: entry.types
     }
+    document.getElementById("sched_button").disabled = true;
+    document.getElementById("bft_button").disabled = true;
     $.ajax({
         url: "/times/bestTime",
         type: "POST",
@@ -478,14 +480,14 @@ function submitBFT(){
             placeId : placeIds,
             type : types
             }   
-            console.log(payload);
+                document.getElementById("defaultOpen").disabled = true;
+                document.getElementById("sched_button").disabled = true;
                 $.ajax({
                 url: "/times/bestPlace",
                 type: "POST",
                 data: JSON.stringify(payload),
                 contentType: "application/json",
                 success: function(data) {
-                    console.log(data);
                     clearInterval(loadingInterval);
                     displayOutputBFT(data, names, placeIds, addresses);
                 },
@@ -684,7 +686,8 @@ function displayOutputBFT(data, names, ids, addresses) {
     }
     // window.scrollBy(0, 500);
     this.output_displayed = true;
-    console.log(output);
+    document.getElementById("defaultOpen").disabled = false;
+    document.getElementById("sched_button").disabled = false;
 
 }
 
@@ -747,8 +750,8 @@ function displayOutputBST(data, place) {
     output.appendChild(new_entry);
     // window.scrollBy(0, 500);
     this.output_displayed = true;
-    console.log(output);
-
+    document.getElementById("sched_button").disabled = false;
+    document.getElementById("bft_button").disabled = false;
 
 }
 
@@ -857,6 +860,8 @@ function displayOutputSchedule(data, names) {
         }
     // window.scrollBy(0, 500);
     this.output_displayed = true;
+    document.getElementById("defaultOpen").disabled = false;
+    document.getElementById("bft_button").disabled = false;
 
 }
 
@@ -954,8 +959,8 @@ function submitSCHEDULE(){
         }
     }
     if (valid) {
-    console.log(payload);
-
+        document.getElementById("defaultOpen").disabled = true;
+        document.getElementById("bft_button").disabled = true;
         $.ajax({
             url: "/scheduler/update",
             type: "POST",
