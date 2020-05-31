@@ -2,28 +2,42 @@
 export FLASK_APP=server.py
 export FLASK_ENV=development
 
-# Database connection must be tested everytime regardless of skip flag
-first_install=1
-log_skip=1
 
 # You can specify the -skip flag at runtime to skip over trying to install requirements
 if [ "$1" == "-skip" ] ; then
 	python=1
 	req=1
+	logging=1
+	multi_thread=1
 else
+  export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+  multi_thread=1
+  echo "------------------------- Attention -------------------------------"
+  echo "   If this is your first installation, you may have to restart "
+  echo "   your terminal, after this preliminary installation"
+  echo "-------------------------------------------------------------------"
 	python=0
 	req=0
 	mkdir tmp/
 	touch tmp/soteria.log
+	touch tmp/build.log
+	echo "------------------------- Step 1/4 --------------------------------"
+	echo "      Succesfully setup 'tmp' directory and logging files"
+	echo "-------------------------------------------------------------------"
+	logging=1
+	python=0
 fi
 
 # Checks for correct python version
-if [[ python == 0 ]] ; then
-  version=$(python -V 2>&1 | grep -Po '(?<=Python )(.+)')
+if [[ "$python" == 0 ]] ; then
+  version=(python3 -c 'import sys; print(sys.version_info[:])')
   if [[ -z "$version" ]] ; then
     echo "Requires Python 3.7.5 or higher to run"
     exit 1;
   else
+    echo "------------------------- Step 2/4 --------------------------------"
+	  echo "      Succesfully Verified Python3 Installation"
+	  echo "-------------------------------------------------------------------"
     python=1
   fi
 fi
@@ -34,7 +48,16 @@ if [ "$req" != 1 ] ; then
 	 pip3 install $p
  	done < requirements.txt
 	req=1
+	echo "--------------------------- Step 3/4 ------------------------------"
+	echo "       Succesfully Installed Python3 Pip Requirements"
+	echo "-------------------------------------------------------------------"
 fi
 
+# This wil update the build log with how the installation has gone
+echo "Python: ".$python." Pip: ".$req." Multi-Thread: ".$multi_thread." Logging: ".$logging >> tmp/build.log
+
 # Try to kickstart Python Server:
+echo "--------------------------- Step 4/4 ------------------------------"
+echo "                 ...Launching Flask Server..."
+echo "-------------------------------------------------------------------"
 python3 -m server.api
