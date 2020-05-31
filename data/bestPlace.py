@@ -22,7 +22,7 @@ class bestPlace(Resource):
         day = calendar.day_name[today.weekday()]
 
         # Retrieve the best times and return it
-        ret = self.get_best_place(places, day)
+        ret = self.get_best_place(places, day, types)
         return ret, 200
 
     @staticmethod
