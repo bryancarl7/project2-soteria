@@ -588,8 +588,10 @@ function getTimeDifference(index) {
 
     var timeStart = new Date(today + " " + from_t.value);
     var timeEnd = new Date(today + " " + to_t.value);
+    if (to_t.value < from_t.value && to_t.value > "00:00") {
+        timeEnd.setDate(timeEnd.getDate()+1);
+    }
     var diff = Math.abs(timeEnd - timeStart);
-    console.log(diff);
     return Math.floor((diff/1000)/60);
 
 }
@@ -683,11 +685,11 @@ function displayOutputBFT(data, names, ids, addresses) {
         new_entry.appendChild(newOne);
         }
 
-    }
         }
-    
-    output.appendChild(new_entry);
-    }
+        output.appendChild(new_entry);
+
+        }
+        }
     // window.scrollBy(0, 500);
     this.output_displayed = true;
     document.getElementById("defaultOpen").disabled = false;
@@ -904,6 +906,7 @@ function submitSCHEDULE(){
                             // cur_type[places[i+1].place_id] = places[i+1].types;
                             console.log(places);
                             names[places[i+1].place_id] = places[i+1].name;
+
                             console.log(places);
                             let add = {
                             placeId : places[i+1].place_id,
