@@ -446,42 +446,40 @@ function submitBFT(){
     var valid = true;
    //  var entry = auto_bft.getPLace()
     var entry = document.getElementById("BFT_INPUT");
-    console.log(entry.value);
     if (entry.value == "") {
       alert("ERROR: PLEASE ENTER A TYPE BEFORE SUBMITTING")
       valid = false;
     }
+        if (valid) {
         loadingInterval = setInterval(loading, 250);
         this.output_displayed = true;
         window.scrollBy(0, 200);
 
         var names = [];
         var addresses = [];
+        var types = {};
         const proxyurl = "https://cors-anywhere.herokuapp.com/";
         const url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + entry.value + "&key=AIzaSyAZFKIOvAOaqbLQ6FlrrxCMPBofdoNYTUs"; // site that doesn’t send Access-Control-*
         fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
         .then(response => response.json())
         .then(contents => {
             console.log(contents); 
-            if (contents.status == "ZERO_RESULTS") {
-                clearInterval(loadingInterval);
-                displayFailureMessage();
-            }
-            else {
+            if (contents.status == "OK") {
             let results = contents.results;
             var placeIds = [];
             for (var i = 0; i < 10; i++) {
                 let cur = results[i];
                 placeIds.push(cur.place_id);
+                types[cur.place_id] = cur.types;
                 names.push(cur.name);
-                addresses.push(cur.formatted_address)
+                addresses.push(cur.formatted_address);
             }
             let payload = {
-            type : placeIds
-            }
-            
-            if (valid) {
-            $.ajax({
+            placeId : placeIds,
+            type : types
+            }   
+            console.log(payload);
+                $.ajax({
                 url: "/times/bestPlace",
                 type: "POST",
                 data: JSON.stringify(payload),
@@ -500,14 +498,16 @@ function submitBFT(){
 
                 }
             });
-            }
             
+            }
             else {
                 clearInterval(loadingInterval);
-            }
+                displayFailureMessage();
             }
             })
         .catch(() => {clearInterval(loadingInterval); displayFailureMessage();});
+
+        }
 
 
 }
@@ -613,8 +613,10 @@ function displayOutputBFT(data, names, ids, addresses) {
     output.appendChild(title);
     // var title = document.createElement("HEADER");
     // title.innerHTML = type;
+    let main_data = data[0];
+    let sim_data = data[1];
     for (var j = 0; j < ids.length; j++) {
-        let cur = data[ids[j]];
+        let cur = main_data[ids[j]];
         if (cur[0][1] != 0) {
         var new_entry = document.createElement("div");
         new_entry.class = "relative";
@@ -626,7 +628,14 @@ function displayOutputBFT(data, names, ids, addresses) {
         div_container.id = "popupparent";
 
         var container = document.createElement("span");
-        var contentName = document.createTextNode(names[j]);
+        var contentName;
+        if (sim_data[ids[j]] == 1 || sim_data[ids[j]] == 0) {
+            contentName = document.createTextNode(names[j]);
+        }
+        else {
+            contentName = document.createTextNode("* " + names[j]);
+        }
+        
         container.appendChild(contentName);
         container.style.color = "red";
 

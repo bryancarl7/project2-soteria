@@ -106,7 +106,7 @@ select {
 #BFT {
   position: relative;
   float:left;
-  height: 400px;
+  height: 550px;
 }
 #output-header {
   font-size: 40px;
@@ -117,7 +117,7 @@ select {
   position: relative;
   clear: both;
   text-align: center;
-  height: 400px;
+  height: 500px;
   font-size: 20px;
   overflow: auto;
 }
@@ -215,6 +215,8 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
   color: #fff;
   padding: 19px 5px
 }
+
+
 
 #popupparent #popup {
   display: none;
