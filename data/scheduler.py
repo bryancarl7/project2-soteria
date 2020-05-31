@@ -332,6 +332,7 @@ class scheduler(Resource):
 
         entries = {}
         length = len(json_dump)
+        types = {}
         ctr = 0
         while ctr < length:
             # Load up our entry
