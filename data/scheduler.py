@@ -328,7 +328,7 @@ class scheduler(Resource):
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()] 
-        types = json_dump['type']
+
 
         entries = {}
         length = len(json_dump)
@@ -338,11 +338,13 @@ class scheduler(Resource):
             id = json_dump[str(ctr)]['placeId']
             time = json_dump[str(ctr)]['time']
             prio = json_dump[str(ctr)]['priority']
+            loctypes = json_dump[str(ctr)]['type']
             print(id, time, prio)
 
             # Store the entry we created
             entry = (prio, time)
             entries[id] = entry
+            types[id] = loctypes
             ctr += 1
 
         # Process the list
