@@ -382,7 +382,7 @@ class scheduler(Resource):
     @classmethod
     def bruteforce_helper(cls, sched_obj, locations, curr_times, closed_times,  pop_dict):
         lowest_score = 144001 # zscore = popularity in hour * minutes in the slot, max = 24 * 60 * 100 = 144000.
-        final_schedule = None
+
         if len(locations) == 0:
             return 0, sched_obj
         for loc in locations:
@@ -434,15 +434,18 @@ class scheduler(Resource):
                     best_bleed = Must_bleed
 
             if best_hour_score == 144001:
-                #unable to insert this location *at all*!!
-                #if we cannot insert here before other locations, we cannot insert it later; we *must* return now.
-                #invalid schedule; will never be considered over base
-                return 144001, sched_obj
+                #unable to insert this location *at all*
+                '''If we cannot insert at this point, checking our children without this loc
+                is the same as removing the loc from our current list and continuing this loop.
+                If we're the last, then we just finish now. Else, any location after this one
+                will run faster.'''
+                locations.remove(loc)
+                continue
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
             #print(best_hour_score)
             #print(best_hour)
             #insert's logic handles shifts
-            truth = schedule.insert(loc, best_hour, curr_times[loc], closed_times[loc], pop_dict[loc], best_hour_dir)
+            schedule.insert(loc, best_hour, curr_times[loc], closed_times[loc], pop_dict[loc], best_hour_dir)
 
             #otherwise, recurse
             rec_score, rec_schedule = cls.bruteforce_helper(schedule, [x for x in locations if x != loc], curr_times, closed_times, pop_dict)
