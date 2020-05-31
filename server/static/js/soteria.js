@@ -803,7 +803,13 @@ function displayOutputSchedule(data, names) {
         var newContent2 = document.createTextNode(" between ");
         var newContent3 = document.createTextNode(" and ");
         var container = document.createElement("span");
-        var contentName = document.createTextNode(name);
+        var contentName;
+        if (cur[3] == 1 || cur[3] == 0) {
+            contentName = document.createTextNode(name);
+        }
+        else {
+            contentName = document.createTextNode("* " + name);
+        }
         container.appendChild(contentName);
         container.style.color = "red";
         new_entry.appendChild(newContent1);

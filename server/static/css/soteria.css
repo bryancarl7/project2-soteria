@@ -93,7 +93,7 @@ select {
   position: relative;
   float:left;
   overflow: auto;
-  height: 850px;
+  height: 900px;
   /* makes schedule scrollable */
   /* overflow: auto; */
 
@@ -101,7 +101,7 @@ select {
 #BST {
   position: relative;
   float:left;
-  height: 400px;
+  height: 500px;
 }
 #BFT {
   position: relative;
@@ -132,7 +132,6 @@ h1 {
 }
 h4 {
     text-align: center;
-    padding: 10px 10px;
     font-size: 20px;
     font-weight: bolder;
     color: blue;
