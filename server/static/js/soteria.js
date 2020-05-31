@@ -902,7 +902,9 @@ function submitSCHEDULE(){
                             // console.log(places[i+1]);
                             let cur_type = {};
                             // cur_type[places[i+1].place_id] = places[i+1].types;
+                            console.log(places);
                             names[places[i+1].place_id] = places[i+1].name;
+                            console.log(places);
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
