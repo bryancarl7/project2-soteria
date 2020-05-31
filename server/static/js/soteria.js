@@ -425,6 +425,8 @@ function submitBST(){
         },
         statusCode: {
                     500: function() {
+                    document.getElementById("sched_button").disabled = false;
+                    document.getElementById("bft_button").disabled = false;
                     clearInterval(loadingInterval);
                     displayFailureMessage()
 
@@ -493,6 +495,8 @@ function submitBFT(){
                 },
                 statusCode: {
                     500: function() {
+                    document.getElementById("defaultOpen").disabled = false;
+                    document.getElementById("sched_button").disabled = false;
                     clearInterval(loadingInterval);
                     displayFailureMessage()
 
@@ -525,7 +529,7 @@ function displayFailureMessage() {
     var title = document.createElement("HEADER");
     title.setAttribute("id", "output_header"); 
     var y = document.createElement("H2");
-    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for that place / type");
+    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for the specified input(s)");
     y.appendChild(t);
     title.appendChild(y);
     output.appendChild(title);
@@ -871,6 +875,7 @@ function displayOutputSchedule(data, names) {
 function submitSCHEDULE(){
     // TODO
     var names = {};
+    var types = {};
     var index = 1;
     var output = [];
     var valid = true;
@@ -895,14 +900,16 @@ function submitSCHEDULE(){
 
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
+                            let cur_type = {};
+                            cur_type[places[i+1].place_id] = places[i+1].types;
                             names[places[i+1].place_id] = places[i+1].name;
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
-                            type : places[i+1].types
+                            type : cur_type
                             }
-
+                            // types[places[i+1].place_id] = places[i+1].types;
                             payload[index] = add;
                             index += 1;
                         }
@@ -932,12 +939,15 @@ function submitSCHEDULE(){
                         let valid_times = validTimeDifference(0);
                         if (valid_times) {
                             // console.log(places[0]);
+                            let cur_type = {};
+                            cur_type[places[0].place_id] = places[0].types;
                             let add = {
                             placeId : places[0].place_id,
                             time : getTimeDifference(0),
                             priority : getPriority(0),
-                            type : places[0].types
+                            type : cur_type
                             }
+                            // types[places[0].place_id] = places[0].types;
                             names[places[0].place_id] = places[0].name;
                             payload[0] = add;
                         }
@@ -961,6 +971,7 @@ function submitSCHEDULE(){
     if (valid) {
         document.getElementById("defaultOpen").disabled = true;
         document.getElementById("bft_button").disabled = true;
+        console.log(payload);
         $.ajax({
             url: "/scheduler/update",
             type: "POST",
@@ -973,6 +984,8 @@ function submitSCHEDULE(){
             },
             statusCode: {
                 500: function() {
+                document.getElementById("defaultOpen").disabled = false;
+                document.getElementById("bft_button").disabled = false;
                 clearInterval(loadingInterval);
                 displayFailureMessage()
 
