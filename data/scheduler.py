@@ -349,7 +349,7 @@ class scheduler(Resource):
         return built, 200
     
     @staticmethod
-    def build_greedy_list(curr_locations, day, test_dict = None):
+    def build_greedy_list(curr_locations, day, types_dict = None, test_dict = None):
         '''
         List(placeids), string, optional dict(placeid: list[popularity]) -> list
         helper method. Builds a sorted list of best hours within a given priority. 
@@ -361,7 +361,7 @@ class scheduler(Resource):
             unable to allocate that location in the schedule.
             also creates a dictionary of location:closedtimes, for insertion purposes.
         '''
-        tempdict, flaglist = bestPlace.get_best_place(curr_locations, day, test_dict)
+        tempdict, flaglist = bestPlace.get_best_place(curr_locations, day, types_dict, test_dict)
         tuplelist = []
         closed_hours = {x:[] for x in curr_locations}
         resorted_dict = {}
@@ -453,7 +453,7 @@ class scheduler(Resource):
 
 
     @classmethod
-    def optimize_schedule(cls, schedule, day, test_dict=None, strict = False, bruteforce = True):
+    def optimize_schedule(cls, schedule, day, types_dict = None, test_dict=None, strict = False, bruteforce = True):
         '''
         Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
@@ -486,7 +486,7 @@ class scheduler(Resource):
             test_subset = None
             if test_dict is not None:
                 test_subset = {x:test_dict[x] for x in curr_locations}
-            poplist, closedlist, glist, flaglist = cls.build_greedy_list(curr_locations, day, test_subset)
+            poplist, closedlist, glist, flaglist = cls.build_greedy_list(curr_locations, day, types_dict, test_subset)
             #keep master list updated
             flags.update(flaglist)
 

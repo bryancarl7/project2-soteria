@@ -32,7 +32,7 @@ class bestTime(Resource):
         # Setup Place_ID
         places = json_dump['placeId']
         location = json_dump['location']
-
+        #NOTE!!!!: expecting a dict of location: [types] here; PASS THE TYPELIST!
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
@@ -43,7 +43,7 @@ class bestTime(Resource):
         return ret, 200
 
     @staticmethod
-    def get_best_time(location, day, test_list=None):
+    def get_best_time(location, day, place_types = [], test_list=None):
         '''
         string(google places API placeid), string(name of day), (optional) 0-100 ratio int list -> (hour, ratio) list
         Returns a sorted list of times to visit a given location, with times of lowest relative population sorted first.
