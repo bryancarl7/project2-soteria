@@ -14,7 +14,8 @@ class bestPlace(Resource):
         print(json.dumps(json_dump, indent=4))
 
         # Setup Place_ID
-        places = json_dump['type']
+        places = json_dump['placeId']
+        types = json_dump['type']
 
         # Setup the day of the week
         today = datetime.datetime.today()
@@ -25,11 +26,11 @@ class bestPlace(Resource):
         return ret, 200
 
     @staticmethod
-    def place_helper(d, location, day, test_list):
+    def place_helper(d, location, day, types_dict, test_list):
         '''
         wrapper for bestPlace call, assigns return to the proxydict.
         '''
-        ret, flag = bestTime.get_best_time(location, day, test_list)
+        ret, flag = bestTime.get_best_time(location, day, types_dict, test_list)
         print(flag)
         d[location] = ret
         d[(location + "flag")] = flag
@@ -53,7 +54,7 @@ class bestPlace(Resource):
             except KeyError as e:
                 raise KeyError("locationid is not a key in test_dict")
         else:
-            arglist = [ (proxdict, x, day, None) for x in locations ]
+            arglist = [ (proxdict, x, day, types_dict[x], None) for x in locations ]
 
         with multiprocessing.Pool() as p:
             p.starmap(bestPlace.place_helper, arglist)
