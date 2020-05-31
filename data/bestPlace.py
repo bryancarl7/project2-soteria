@@ -35,7 +35,7 @@ class bestPlace(Resource):
         d[(location + "flag")] = flag
 
     @staticmethod
-    def get_best_place(locations, day, test_dict = None):
+    def get_best_place(locations, day, types_dict = None, test_dict = None):
         '''
         list, string, dict(location: popularity) -> dict(location: (hour, popularity))
         Given a list of google maps placeid's and the day of the week, returns a dictionary of best times.
@@ -45,9 +45,11 @@ class bestPlace(Resource):
         proxdict = manager.dict( { i : None for i in locations } )
         simkeys = {}
         arglist = None
+        if types_dict is None:
+            types_dict = {x:[] for x in locations}
         if(test_dict is not None):
             try:
-                arglist = [ (proxdict, x, day, test_dict[x]) for x in locations ]
+                arglist = [ (proxdict, x, day, types_dict[x], test_dict[x]) for x in locations ]
             except KeyError as e:
                 raise KeyError("locationid is not a key in test_dict")
         else:
