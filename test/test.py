@@ -64,25 +64,128 @@ class ServerTests(unittest.TestCase):
                 response = None
                 if route == "/scheduler/update":
                     response = client.post(route, json= {
-                        "0": {
-                         "placeId": "ChIJueDG4u99hYARsvNODbmw8UQ",
-                         "time": 120,
-                         "priority": "1",
-                        "location": {
-                             "lat": 0,
-                             "lng": 0
-                         }}})
+
+                                "0": {
+                                    "placeId": "ChIJy1J05GSHj4ARTvUR7hHkajg",
+                                    "time": 120,
+                                    "priority": "1",
+                                    "type": [
+                                        "park",
+                                        "tourist_attraction",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ]
+                                },
+                                "1": {
+                                    "placeId": "ChIJLx5Zf0N-hYARgSyH_pVY7rQ",
+                                    "time": 129,
+                                    "priority": "5",
+                                    "type": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ]
+                                }
+                            }
+                            )
                 elif route == "/times/bestPlace":
                     response = client.post(route, json={
-                        "type": ["ChIJueDG4u99hYARsvNODbmw8UQ"]
-                    })
+                                "placeId": [
+                                    "ChIJycspTWsewVQR-6AWLn5b0SI",
+                                    "ChIJo-lWcS8ewVQRBfpW0CZB-7I",
+                                    "ChIJmWVWnREewVQRRS5lF9yW8FU",
+                                    "ChIJO4Qk6X4dwVQRtWY2W1l3bZc",
+                                    "ChIJM0hybxEewVQRujac4KF-fLo",
+                                    "ChIJpVju6eQdwVQRsrGHuLxesxY",
+                                    "ChIJB0XOu-wdwVQR3gEsw-n_aDw",
+                                    "ChIJswlLbW0ewVQRqEcNPylhV3g",
+                                    "ChIJ1UgjVwsewVQRFeYaTzCEgvA",
+                                    "ChIJT3INGkMewVQRc4CGF9O2M4Q"
+                                ],
+                                "type": {
+                                    "ChIJycspTWsewVQR-6AWLn5b0SI": [
+                                        "bar",
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJo-lWcS8ewVQRBfpW0CZB-7I": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJmWVWnREewVQRRS5lF9yW8FU": [
+                                        "bar",
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJO4Qk6X4dwVQRtWY2W1l3bZc": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJM0hybxEewVQRujac4KF-fLo": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJpVju6eQdwVQRsrGHuLxesxY": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJB0XOu-wdwVQR3gEsw-n_aDw": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJswlLbW0ewVQRqEcNPylhV3g": [
+                                        "meal_takeaway",
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJ1UgjVwsewVQRFeYaTzCEgvA": [
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ],
+                                    "ChIJT3INGkMewVQRc4CGF9O2M4Q": [
+                                        "bar",
+                                        "restaurant",
+                                        "food",
+                                        "point_of_interest",
+                                        "establishment"
+                                    ]
+                                }
+
+                            })
                 else:
                     response = client.post(route, json={
-                        "placeId": "ChIJueDG4u99hYARsvNODbmw8UQ",
-                        "location": {
-                            "lat": 0,
-                            "lng": 0
-                        }})
+                                "placeId": "ChIJxapf8PF_hYARPg1Ki7Ws9pE",
+                                "location": {
+                                    "lat": 37.8707458,
+                                    "lng": -122.2731167
+                                },
+                                "type": [
+                                    "cafe",
+                                    "food",
+                                    "point_of_interest",
+                                    "establishment"
+                                ]
+                            }
+                            )
                 self.assertEqual(response.status_code, 200)
 
 # Need to discuss:
