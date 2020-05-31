@@ -327,7 +327,8 @@ class scheduler(Resource):
 
         # Setup the day of the week
         today = datetime.datetime.today()
-        day = calendar.day_name[today.weekday()]
+        day = calendar.day_name[today.weekday()] 
+        types = json_dump['type']
 
         entries = {}
         length = len(json_dump)
@@ -345,7 +346,7 @@ class scheduler(Resource):
             ctr += 1
 
         # Process the list
-        built = self.optimize_schedule(entries, day)
+        built = self.optimize_schedule(entries, day, types)
         return built, 200
     
     @staticmethod

@@ -32,13 +32,14 @@ class bestTime(Resource):
         # Setup Place_ID
         places = json_dump['placeId']
         location = json_dump['location']
+        types = json_dump['type']
         #NOTE!!!!: expecting a dict of location: [types] here; PASS THE TYPELIST!
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
 
         # Retrieve the best times and return it
-        ret, flag = self.get_best_time(places, day)
+        ret, flag = self.get_best_time(places, day, types)
         print(ret)
         return ret, 200
 
@@ -58,6 +59,8 @@ class bestTime(Resource):
         times = None
         hours = [i for i in range(24)]
         flag = Flag(0)
+        print("place_types is: ")
+        print(place_types)
         if test_list:
             if len(test_list) != 24:
                 raise TypeError("Malformed list passed; needs 24 ints")
