@@ -901,13 +901,13 @@ function submitSCHEDULE(){
                             // SEND TYPE ALONG WITH THE PLACE ID
                             // console.log(places[i+1]);
                             let cur_type = {};
-                            cur_type[places[i+1].place_id] = places[i+1].types;
+                            // cur_type[places[i+1].place_id] = places[i+1].types;
                             names[places[i+1].place_id] = places[i+1].name;
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
-                            type : cur_type
+                            type : places[i+1].types
                             }
                             // types[places[i+1].place_id] = places[i+1].types;
                             payload[index] = add;
@@ -940,12 +940,12 @@ function submitSCHEDULE(){
                         if (valid_times) {
                             // console.log(places[0]);
                             let cur_type = {};
-                            cur_type[places[0].place_id] = places[0].types;
+                            // cur_type[places[0].place_id] = places[0].types;
                             let add = {
                             placeId : places[0].place_id,
                             time : getTimeDifference(0),
                             priority : getPriority(0),
-                            type : cur_type
+                            type : places[0].types
                             }
                             // types[places[0].place_id] = places[0].types;
                             names[places[0].place_id] = places[0].name;
