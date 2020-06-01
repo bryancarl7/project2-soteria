@@ -297,10 +297,13 @@ class BestTimeTests(unittest.TestCase):
 
     # test a place types department store, grocery or supermarket, electronics_store, furniture_store
     def test_get_best_time_1(self):
+        """
+        Testing the functionality of BestTime API and Testing get best time function
+        """
         print()
         print("=" * 80)
         print("Testing the functionality of BestTime API")
-        print("Testing  get best time function")
+        print("Testing get best time function")
         bt = bestTime()
         locations = ["ChIJcWPM1VYRkFQRpjilF_m5vew"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -314,10 +317,13 @@ class BestTimeTests(unittest.TestCase):
 
     # test a place type locality, political
     def test_get_best_time_2(self):
+        """
+        Testing the functionality of BestTime API and Testing get best time function
+        """
         print()
         print("=" * 80)
         print("Testing the functionality of BestTime API")
-        print("Testing  get best time function")
+        print("Testing get best time function")
         bt = bestTime()
         locations = ["ChIJMz0NgmbBxokREdZcZuO-TWE"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -331,10 +337,13 @@ class BestTimeTests(unittest.TestCase):
 
     # test a place type point of interest, establishment
     def test_get_best_time_3(self):
+        """
+        Testing the functionality of BestTime API and Testing get best time function
+        """
         print()
         print("=" * 80)
         print("Testing the functionality of BestTime API")
-        print("Testing  get best time function")
+        print("Testing get best time function")
         bt = bestTime()
         locations = ["ChIJsQLp1UUVkFQRDtojPV9uMSY"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -349,10 +358,13 @@ class BestTimeTests(unittest.TestCase):
 class BestPlaceTests(unittest.TestCase):
 
     def test_get_best_place_1(self):
+        """
+        Testing the functionality of BestPlace API and Testing get best place function      
+        """
         print()
         print("=" * 80)
         print("Testing the functionality of BestPlace API")
-        print("Testing  get best place function")
+        print("Testing get best place function")
         bp = bestPlace()
         locations = ["ChIJNVdWgfiglVQRSuD8w0aQGrk",
                      "ChIJLbTuxOqglVQRXgWNWDb3baI",
