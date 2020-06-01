@@ -377,4 +377,5 @@ class BestPlaceTests(unittest.TestCase):
             self.assertEqual(len(locations), len(real_result))
 
 if __name__ == '__main__':
+    print("It will take a couple of minutes for testing")
     unittest.main()
