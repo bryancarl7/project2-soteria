@@ -3,7 +3,7 @@ test.py
 
 ===============================================================================
 
-Last Modified: 31 May 2020
+Last Modified: 1 June 2020
 Modification By: Jinhu Qi
 
 Creation Date: 15 May 2020
@@ -18,6 +18,8 @@ of this, it interfaces with every single module.
 # Standard Imports
 import time
 import unittest
+import warnings
+
 from unittest import mock
 
 # Third Party Packages
@@ -294,77 +296,82 @@ class BusyTimesReporterTests(unittest.TestCase):
                 self.assertIsNotNone(result)
 
 class BestTimeTests(unittest.TestCase):
-
+    def setUp(self):
+        warnings.simplefilter("ignore", ResourceWarning)
     # test a place types department store, grocery or supermarket, electronics_store, furniture_store
     def test_get_best_time_1(self):
         """
-        Testing the functionality of BestTime API and Testing get best time function
+        Testing the functionality of BestTime API and get best time function
         """
         print()
         print("=" * 80)
         print("Testing the functionality of BestTime API")
-        print("Testing get best time function")
+        print("Testing  get best time function")
+        print("bestTime test case 1: \n")
         bt = bestTime()
         locations = ["ChIJcWPM1VYRkFQRpjilF_m5vew"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         print("For bestTime, \n")
         expected_result = 24
+        place_type = ["department_store", "grocery_or_supermarket", "electronics_store", "furniture_store"]
         for location in locations:
             for day in days:
-                print("Checking for location:", location, ", days:", day)
-                result = bt.get_best_time(location, day, ["department_store", "grocery_or_supermarket", "electronics_store", "furniture_store"])[0]
+                print("Checking for location:", location, ", days:", day, ", place type:", place_type)
+                result = bt.get_best_time(location, day)[0]
                 self.assertEqual(len(result), expected_result)
 
     # test a place type locality, political
     def test_get_best_time_2(self):
         """
-        Testing the functionality of BestTime API and Testing get best time function
+        Testing the functionality of BestTime API and get best time function -- bestTime test case 2
         """
-        print()
-        print("=" * 80)
-        print("Testing the functionality of BestTime API")
-        print("Testing get best time function")
         bt = bestTime()
         locations = ["ChIJMz0NgmbBxokREdZcZuO-TWE"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-        print("For bestTime, \n")
+        print()
+        print("=" * 80)
+        print("bestTime test case 2: \n")
+        place_type =  ["locality", "political"]
         expected_result = 24
         for location in locations:
             for day in days:
-                print("Checking for location:", location, ", days:", day)
-                result = bt.get_best_time(location, day, ["locality", "political"])[0]
+                print("Checking for location:", location, ", days:", day, ", place type:", place_type)
+                result = bt.get_best_time(location, day)[0]
                 self.assertEqual(len(result), expected_result)
 
     # test a place type point of interest, establishment
     def test_get_best_time_3(self):
         """
-        Testing the functionality of BestTime API and Testing get best time function
+        Testing the functionality of BestTime API and get best time function -- bestTime test case 3
         """
         print()
         print("=" * 80)
-        print("Testing the functionality of BestTime API")
-        print("Testing get best time function")
+        print("bestTime test case 3: \n")
         bt = bestTime()
         locations = ["ChIJsQLp1UUVkFQRDtojPV9uMSY"]
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         print("For bestTime, \n")
+        place_type = ["point_of_interest", "establishment"]
         expected_result = 24
         for location in locations:
             for day in days:
-                print("Checking for location:", location, ", days:", day)
-                result = bt.get_best_time(location, day, ["point_of_interest", "establishment"])[0]
+                print("Checking for location:", location, ", days:", day, ", place type:", place_type)
+                result = bt.get_best_time(location, day)[0]
                 self.assertEqual(len(result), expected_result)
 
 class BestPlaceTests(unittest.TestCase):
 
+    def setUp(self):
+        warnings.simplefilter("ignore", ResourceWarning)
+
     def test_get_best_place_1(self):
         """
-        Testing the functionality of BestPlace API and Testing get best place function      
+        Testing the functionality of BestPlace API and get best place function
         """
         print()
         print("=" * 80)
         print("Testing the functionality of BestPlace API")
-        print("Testing get best place function")
+        print("Testing  get best place function")
         bp = bestPlace()
         locations = ["ChIJNVdWgfiglVQRSuD8w0aQGrk",
                      "ChIJLbTuxOqglVQRXgWNWDb3baI",
@@ -378,16 +385,18 @@ class BestPlaceTests(unittest.TestCase):
                      "ChIJCZxxVjuhlVQRZmUU9vAIJg4"]
 
         date_index = date.today().weekday()
-        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
         print("For bestPlace, \n")
         print("Checking for the result of today for all locations")
-        print("Checking for location:", locations)
+        print("Checking for this list of locations:", locations)
+        count = 0
         for location in locations:
+            count = count + 1
             real_result = bp.get_best_place(locations, days[date_index])[0]
-            #print("real result:", real_result)
+            print("location", count, "test")
             self.assertEqual(len(locations), len(real_result))
 
+
 if __name__ == '__main__':
-    print("It will take a couple of minutes for testing")
     unittest.main()
