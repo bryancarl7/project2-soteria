@@ -366,7 +366,7 @@ class BestPlaceTests(unittest.TestCase):
                      "ChIJCZxxVjuhlVQRZmUU9vAIJg4"]
 
         date_index = date.today().weekday()
-        days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
         print("For bestPlace, \n")
         print("Checking for the result of today for all locations")
