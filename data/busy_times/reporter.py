@@ -194,5 +194,5 @@ class BusyTimesReporter():
                 FLAG = cls.Flag.SIMULATED_INACCURATE
             else:
                 FLAG = cls.Flag.OK
-        print(busy_times, FLAG)
+        #print(busy_times, FLAG)
         return busy_times, FLAG

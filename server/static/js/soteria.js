@@ -385,7 +385,6 @@ function loading() {
     title.appendChild(y);
     document.getElementById("OUTPUT").innerHTML = "";
     document.getElementById("OUTPUT").appendChild(title);
-    console.log(document.getElementById("OUTPUT"));
     // document.getElementById("OUTPUT").innerHTML = "<span style='color: blue; font-weight: bolder;'>Loading" + dots[loopItem] + "</span>";
 
 }
@@ -535,6 +534,39 @@ function displayFailureMessage() {
     output.appendChild(title);
     this.output_displayed = true;
 }
+
+function displayFailureMessageSchedule2() {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode("One or more of your inputs is invalid");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    this.output_displayed = true;
+}
+
+function displayFailureMessageSchedule1() {
+    if (this.output_displayed) {
+        document.getElementById("OUTPUT").innerHTML = "";
+        this.output_displayed = false;
+    }
+    var output = document.getElementById("OUTPUT");
+    var title = document.createElement("HEADER");
+    title.setAttribute("id", "output_header"); 
+    var y = document.createElement("H2");
+    var t = document.createTextNode("Unfortunately, we couldn't find popular times data for the specified input(s). Please ensure all time frames are valid (>= 1 min durations).");
+    y.appendChild(t);
+    title.appendChild(y);
+    output.appendChild(title);
+    this.output_displayed = true;
+}
+
 
 function validTimeDifference(index) {
     var to = "to";
@@ -877,9 +909,7 @@ function displayOutputSchedule(data, names) {
 function submitSCHEDULE(){
     // TODO
     var names = {};
-    var types = {};
     var index = 1;
-    var output = [];
     var valid = true;
     payload = {};
     let all_times_valid = checkTimesValidity();
@@ -898,23 +928,18 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(index);
                         if (valid_times) {
-
-
-                            // SEND TYPE ALONG WITH THE PLACE ID
-                            // console.log(places[i+1]);
-                            let cur_type = {};
-                            // cur_type[places[i+1].place_id] = places[i+1].types;
-                            console.log(places);
+                            if (places[i+1] == undefined) {
+                                valid = false;
+                                break;
+                            }
                             names[places[i+1].place_id] = places[i+1].name;
 
-                            console.log(places);
                             let add = {
                             placeId : places[i+1].place_id,
                             time : getTimeDifference(index),
                             priority : getPriority(index),
                             type : places[i+1].types
                             }
-                            // types[places[i+1].place_id] = places[i+1].types;
                             payload[index] = add;
                             index += 1;
                         }
@@ -943,16 +968,16 @@ function submitSCHEDULE(){
                     if (valid_priority) {
                         let valid_times = validTimeDifference(0);
                         if (valid_times) {
-                            // console.log(places[0]);
-                            let cur_type = {};
-                            // cur_type[places[0].place_id] = places[0].types;
+                            if (places[0] == undefined) {
+                                valid = false;
+                                break;
+                            }
                             let add = {
                             placeId : places[0].place_id,
                             time : getTimeDifference(0),
                             priority : getPriority(0),
                             type : places[0].types
                             }
-                            // types[places[0].place_id] = places[0].types;
                             names[places[0].place_id] = places[0].name;
                             payload[0] = add;
                         }
@@ -992,7 +1017,7 @@ function submitSCHEDULE(){
                 document.getElementById("defaultOpen").disabled = false;
                 document.getElementById("bft_button").disabled = false;
                 clearInterval(loadingInterval);
-                displayFailureMessage()
+                displayFailureMessageSchedule1()
 
                 }
 
@@ -1002,6 +1027,8 @@ function submitSCHEDULE(){
     }
     else {
         clearInterval(loadingInterval);
+        displayFailureMessageSchedule2()
+
     }
     }
 }
