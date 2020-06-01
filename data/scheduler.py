@@ -3,7 +3,7 @@ from flask_restful import Resource, request
 import datetime, calendar, json
 from data.bestPlace import bestPlace
 from copy import deepcopy
-
+import math
 PADDING = 0
 '''if we try to insert into an hour with <PADDING minutes left and need to
     add remaining time to the next, we instead ignore it. Mostly for elegance: 
@@ -381,7 +381,7 @@ class scheduler(Resource):
 
     @classmethod
     def bruteforce_helper(cls, sched_obj, locations, curr_times, closed_times,  pop_dict):
-        lowest_score = 144001 # zscore = popularity in hour * minutes in the slot, max = 24 * 60 * 100 = 144000.
+        lowest_score = math.inf # zscore = popularity in hour * minutes in the slot, max = 24 * 60 * 100 = 144000.
 
         if len(locations) == 0:
             return 0, sched_obj
@@ -433,14 +433,18 @@ class scheduler(Resource):
                     best_hour_dir = direction
                     best_bleed = Must_bleed
 
-            if best_hour_score == 144001:
+            #if best_hour_score == 144001:
                 #unable to insert this location *at all*
                 '''If we cannot insert at this point, checking our children without this loc
                 is the same as removing the loc from our current list and continuing this loop.
                 If we're the last, then we just finish now. Else, any location after this one
-                will run faster.'''
-                locations.remove(loc)
-                continue
+                will run faster.
+                Amend 5/31: If we instead allow for lowest_score to be infinity, we can track all failures to insert
+                by adding 144001 (a number > max possible schedule). As such, any schedule with 1 location unscheduled will be considered
+                worse than a schedule with all locations scheduled. Likewise, 1 location unscheduled will always be better
+                than a schedule with 2 locations unscheduled.'''
+                #locations.remove(loc)
+                #continue
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
             #print(best_hour_score)
             #print(best_hour)
