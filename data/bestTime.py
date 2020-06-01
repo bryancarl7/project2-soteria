@@ -59,8 +59,8 @@ class bestTime(Resource):
         times = None
         hours = [i for i in range(24)]
         flag = Flag(0)
-        print("place_types is: ")
-        print(place_types)
+        #print("place_types is: ")
+        #print(place_types)
         if test_list:
             if len(test_list) != 24:
                 raise TypeError("Malformed list passed; needs 24 ints")
