@@ -11,8 +11,8 @@ import logging
 #########################################
 
 # Some environment vars, don't mind me
-ENV = 'develop'
-PORT = 3000
+ENV = 'production'
+PORT = input("Please enter a PORT you would like to host on (four digits 0-9): ")
 HOST = '0.0.0.0'
 
 # Setup Apps/API
@@ -38,7 +38,8 @@ if __name__ == "__main__":
                             datefmt="%m/%d/%Y %H:%M:%S %p")
         try:
             # Attempt to run the app
-            print("Hosting Flask app on Port: " + str(PORT))
+            print("\n\t* Running on http://0.0.0.0:{} *\n".format(PORT))
+            print("Unless Hosted on a domain, then replace the '0.0.0.0' with your domain")
 
             # Run the app and get the successful exit
             app.run(host=HOST, port=PORT, debug=False)
@@ -48,5 +49,5 @@ if __name__ == "__main__":
             # unsure whish is being tripped so we have to check
             app.logger.warning("Could not host Flask App")
             app.logger.exception(ex.__traceback__)
-    except:
-        print("Unable to setup logging")
+    except FileNotFoundError as ex:
+        print("Unable to setup logging, please ensure you have ran the build script")
