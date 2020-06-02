@@ -31,7 +31,7 @@ class bestPlace(Resource):
         wrapper for bestPlace call, assigns return to the proxydict.
         '''
         ret, flag = bestTime.get_best_time(location, day, types_dict, test_list)
-        print(flag)
+        #print(flag)
         d[location] = ret
         d[(location + "flag")] = flag
 
