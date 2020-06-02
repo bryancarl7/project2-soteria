@@ -1,23 +1,27 @@
 #!/bin/bash
+
+# Flask variables so that there is an environment setup
 export FLASK_APP=server.py
 export FLASK_ENV=development
 
 
 # You can specify the -skip flag at runtime to skip over trying to install requirements
 if [ "$1" == "-skip" ] ; then
+  # This skip is to set the flags to a switch
 	python=1
 	req=1
 	logging=1
 	multi_thread=1
 else
+  # To ensure that Mac OS doesnt have trouble multi threading
   export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
   multi_thread=1
   echo "------------------------- Attention -------------------------------"
   echo "   If this is your first installation, you may have to restart "
   echo "   your terminal, after this preliminary installation"
   echo "-------------------------------------------------------------------"
-	python=0
-	req=0
+
+	# Setup files and logs that we will need
 	mkdir tmp/
 	touch tmp/soteria.log
 	touch tmp/build.log
@@ -26,7 +30,9 @@ else
 	echo "-------------------------------------------------------------------"
 	logging=1
 	python=0
+	req=0
 fi
+
 
 # Checks for correct python version
 if [[ "$python" == 0 ]] ; then
@@ -42,6 +48,7 @@ if [[ "$python" == 0 ]] ; then
   fi
 fi
 
+
 # Pip installs any python package required from "requirements.txt"
 if [ "$req" != 1 ] ; then
  	while read p; do
@@ -53,8 +60,10 @@ if [ "$req" != 1 ] ; then
 	echo "-------------------------------------------------------------------"
 fi
 
-# This wil update the build log with how the installation has gone
-echo "Python: ".$python." Pip: ".$req." Multi-Thread: ".$multi_thread." Logging: ".$logging >> tmp/build.log
+
+# This will update the build log with how the installation has gone
+echo "Python: "$python ." Pip: "$req. " Multi-Thread: "$multi_thread. " Logging: "$logging >> tmp/build.log
+
 
 # Try to kickstart Python Server:
 echo "--------------------------- Step 4/4 ------------------------------"
