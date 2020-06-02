@@ -29,6 +29,14 @@ Soteria was created to assist in the mitigation of overcrowded business and publ
 
 Run `./build.sh` using your favorite Bash supported terminal
 
+_NOTE_: There were multithreading issues on Mac OS X during development, we reflected this in our build<br>
+scripts, however if you run into issue you may have to run command this to allow multithreading: <br>
+
+`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
+
+Run this command in terminal and restart afterwards and the multithreading issue should subside. <br>
+Source: `https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr`
+
 ## Usage
 
 After installation, the user can access the web page via the following URL:
