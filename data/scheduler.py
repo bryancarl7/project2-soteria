@@ -6,7 +6,7 @@ from copy import deepcopy
 import math
 PADDING = 0
 '''if we try to insert into an hour with <PADDING minutes left and need to
-    add remaining time to the next, we instead ignore it. Mostly for elegance: 
+    add remaining time to the next, we instead ignore it. Mostly for elegance:
     stops situations where you get a schedule of "go to location from 10:58 to 11:43".
 '''
 MAX_RECURSION = 3
@@ -34,14 +34,14 @@ class hour(object):
     def insert(self, location, time):
         # Check if we have space for an event at this hour, and inserts if available.
         if time == 0:
-            #sure, i'll fit nothing here. 
+            #sure, i'll fit nothing here.
             return True
         if (self.timeleft - time) < 0:
             print("false")
             return False
         if self.hasafter:
             # final thing in list is an event that goes into next hour; we need to preserve it's pos at the end of the list
-            # for processing purposes. 
+            # for processing purposes.
             self.locations.insert(-1, [location, self.last_open_time, self.last_open_time + time])
         else:
             self.locations.append( [location, self.last_open_time, self.last_open_time + time])
@@ -49,7 +49,7 @@ class hour(object):
         self.last_open_time += time
         print("true, time remaining: " + str(self.timeleft))
         return True
-    
+
     def adjust_insert(self, location, time):
         # as insert, but inserts at the start of the hour instead of the end.
         # used for events that rollover hours.
@@ -71,7 +71,7 @@ class hour(object):
         print("Adjusted list: ")
         print(self.locations)
         return True
- 
+
     def insert_end(self, location, time):
         # as insert, but we're instead appending to the end of this hour. (bleedover from next hour to this one)
         if self.hasafter:
@@ -126,7 +126,7 @@ RIGHT = 1
 
 class scheduleObj(object):
     '''
-    Schedule object, handles the logic for trying to insert a given time. 
+    Schedule object, handles the logic for trying to insert a given time.
     if STRICT: events will not be allowed to go across hour objects. Otherwise, the scheduler will attempt to reshuffle
     '''
     def __init__(self, STRICT = True):
@@ -148,10 +148,10 @@ class scheduleObj(object):
                 return False
 
             success, dir = self.recursive_insert(location, hour, ( time - hourobj.timeleft), closedtimes, pop_times, direction)
-            
+
             if success == False:
                 return False
-            if dir == LEFT: 
+            if dir == LEFT:
                 # we inserted to the left; adjust all other times in currhour so we can insert ourselves
                 return hourobj.adjust_insert(location, hourobj.timeleft)
             else:
@@ -166,7 +166,7 @@ class scheduleObj(object):
             #only check if we need to
             score, direction = self.generate_zscore(location, hour, time, closedtimes, pop_times)
 
-        if direction == LEFT: 
+        if direction == LEFT:
             return ( self.insert_left(location, hour-1, time, closedtimes), LEFT )
         else:
             return (self.insert_right(location, hour+1, time, closedtimes), RIGHT )
@@ -178,7 +178,7 @@ class scheduleObj(object):
             print(location + " is closed at " + str(hour))
             return False
         if timeleft <= hourobj.timeleft:
-            # We can insert into this slot! 
+            # We can insert into this slot!
                 return hourobj.adjust_insert(location, timeleft)
         if hourobj.timeleft == 60 and hour < 23:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
@@ -196,7 +196,7 @@ class scheduleObj(object):
             print(location + " is closed at " + str(hour))
             return False
         if timeleft <= hourobj.timeleft:
-            # We can insert into this slot! 
+            # We can insert into this slot!
                 return hourobj.insert_end(location, timeleft)
         if hourobj.timeleft == 60 and hour < 23:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
@@ -233,12 +233,12 @@ class scheduleObj(object):
     def generate_zscore_left(self, location, hour, time, closedtimes, pop_times):
         if (hour < 0) or (hour > 23):
             #OOB
-            return 0 
+            return 0
         hourobj = self.hours[hour]
         if hour in closedtimes:
             # business is closed at this hour, send failure back up the list
             #print(location + " is closed at " + str(hour))
-            return 0  
+            return 0
         if hourobj.hasafter:
             #print("hour " + str(hour) + " already has event crossing over, cannot insert")
             return 0
@@ -260,12 +260,12 @@ class scheduleObj(object):
     def generate_zscore_right(self, location, hour, time, closedtimes, pop_times):
         if (hour < 0) or (hour > 23):
             #OOB
-            return 0 
+            return 0
         hourobj = self.hours[hour]
         if hour in closedtimes:
             # business is closed at this hour, send failure back up the list
             #print(location + " is closed at " + str(hour))
-            return 0  
+            return 0
         if time <= hourobj.timeleft:
             #print("successfully finished zscore at: ", str(hour))
             return time * (pop_times[hour])
@@ -280,7 +280,6 @@ class scheduleObj(object):
             else:
                 return 0
        #We couldn't finish insertion here and cannot continue to the previous hour; failed!
-        print("what?")
         return 0
 
     def __str__(self):
@@ -304,7 +303,7 @@ class scheduleObj(object):
                 so [a, 0, 60] + [a, 0, 30] => [a,0,90] which will get turned back into hours after processing.
                 This allows for multi-hour events to get correctly concatenated, whil being processible for strings
                 '''
-                internal[-1][2] = cur[0][2] 
+                internal[-1][2] = cur[0][2]
                 internal += cur[1:]
             else:
                 internal += cur
@@ -327,7 +326,7 @@ class scheduler(Resource):
 
         # Setup the day of the week
         today = datetime.datetime.today()
-        day = calendar.day_name[today.weekday()] 
+        day = calendar.day_name[today.weekday()]
 
 
         entries = {}
@@ -351,16 +350,16 @@ class scheduler(Resource):
         # Process the list
         built = self.optimize_schedule(entries, day, types)
         return built, 200
-    
+
     @staticmethod
     def build_greedy_list(curr_locations, day, types_dict = None, test_dict = None):
         '''
         List(placeids), string, optional dict(placeid: list[popularity]) -> list
-        helper method. Builds a sorted list of best hours within a given priority. 
+        helper method. Builds a sorted list of best hours within a given priority.
         example:
             place x and place y share same priority; x's min popularity is 4 at 6 am , and y's is 6 at 7 am.
             So, the list would look like: [('x', 6, 4), ('y', 7, 6), ....]
-            this allows the caller to iterate over the list until the minimum available hour is selected 
+            this allows the caller to iterate over the list until the minimum available hour is selected
             for all locations. If the caller reaches the end of this list without an available space, we are
             unable to allocate that location in the schedule.
             also creates a dictionary of location:closedtimes, for insertion purposes.
@@ -420,7 +419,6 @@ class scheduler(Resource):
                 part_score, direction = schedule.generate_zscore(loc, x, curr_times[loc] - time_at_hour, closed_times[loc], pop_dict[loc])
                 if (Must_bleed and part_score == 0) or (Must_bleed == False and score == 0):
                     #We couldn't insert recursively and needed to. This hour is invalid
-                    print("reeee")
                     continue
                 score += part_score
 
@@ -457,7 +455,7 @@ class scheduler(Resource):
             if best_hour_score < lowest_score:
                 lowest_score = best_hour_score
                 final_schedule = rec_schedule
-        
+
         return lowest_score, final_schedule
 
 
@@ -468,7 +466,7 @@ class scheduler(Resource):
         '''
         Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
         time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
-        
+
         Given an initial user-defined schedule and the weekday the schedule would be followed, tries to optimize it to ensure as little human contact as possible.
         User-defined priority represents the order to select places: Users are asked to rate places with higher average customers closer to 1
         '''
@@ -477,14 +475,14 @@ class scheduler(Resource):
         by_priority = sorted(schedule.items(), key = lambda pair: pair[1][0])
         sentinel = ("dummy", (999,999))
         by_priority.append(sentinel)
-        
+
         flags = {} #master list of flags
         #initial variables. By priority: (location, (priority, time))
         curr_locations = [by_priority[0][0]]
         curr_priority = by_priority[0][1][0]
         curr_times = {by_priority[0][0]: by_priority[0][1][1]}
         for key, (priority, time) in by_priority[1:]:
-            
+
             if (priority == curr_priority) and (key != "dummy"):
                 curr_locations.append(key)
                 curr_times[key] = time
@@ -516,11 +514,11 @@ class scheduler(Resource):
                     if location in successful_inserts:
                         # This location already exists in the schedule; ignore it.
                         continue
-                    
+
                     if sched.insert(location, hour, curr_times[location], closedlist[location], poplist[location]):
                         successful_inserts.append(location)
                         print(successful_inserts)
-                
+
                 # Check if we inserted everything in this priority level
                 if len(successful_inserts) != len(curr_locations):
                     if PARTIAL_SCHEDULES:
@@ -535,7 +533,7 @@ class scheduler(Resource):
 
             # Previous priority has been handled, setup new priority
             curr_priority = priority
-            curr_locations = [key] 
+            curr_locations = [key]
             curr_times = {key: time}
         schedlist = sched.to_list()
         failed_to_schedule = []
