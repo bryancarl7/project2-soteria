@@ -10,10 +10,10 @@ Initial Author: Bryan Carl
 import json
 from flask_restful import Resource, reqparse, request
 import data.busy_times.reporter as time_reporter
-from data.apiHandler import apiKeyLoader
 import datetime
 import calendar
 import enum
+
 
 # Enum class for flags
 class Flag(enum.Enum):
@@ -33,14 +33,13 @@ class bestTime(Resource):
         places = json_dump['placeId']
         location = json_dump['location']
         types = json_dump['type']
-        #NOTE!!!!: expecting a dict of location: [types] here; PASS THE TYPELIST!
+
         # Setup the day of the week
         today = datetime.datetime.today()
         day = calendar.day_name[today.weekday()]
 
         # Retrieve the best times and return it
         ret, flag = self.get_best_time(places, day, types)
-        print(ret)
         return ret, 200
 
     @staticmethod

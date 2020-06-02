@@ -14,7 +14,6 @@ from flask import Flask, render_template
 from flask_restful import Api
 import logging
 
-
 # Some environment vars, don't mind me
 ENV = 'production'
 PORT = input("Please enter a PORT you would like to host on (four digits 0-9): ")
