@@ -1,3 +1,12 @@
+/*
+Author: Daniel Leef
+Last Modified: May 31, 2020
+*/
+
+/*
+deleteRow : deletes whichever row selected by the user 
+            using a global current_row variable as the index
+*/
 function deleteRow() {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -16,8 +25,9 @@ function deleteRow() {
 }
 
 
-// deleting intermediary row, must update all other rows and their ids
-
+/*
+updateIDs : updates element IDs whenever a row gets deleted 
+*/
 function updateIDs(row) {
 
     for (var i = row+1; i < sched_id; i++) {
@@ -36,11 +46,14 @@ function updateIDs(row) {
 
 }
 
+/*
+updateRowDelIndexes : updates del_rows indices for ease of deletion in the future 
+                      and removes autocomplete listeners + rows
+*/
 function updateRowDelIndexes(row) {
     for (var i = row; i < del_rows.length; i++) {
         del_rows[i].name = "row" + (i);
     }
-    console.log('ROW TO DELETE: ' + row);
     places[row] = null;
     auto_listeners.splice(row-1, 1);
     auto_rows.splice(row-1, 1);
@@ -56,6 +69,9 @@ function compare(a, b) {
     }
 }
 
+/*
+checkTimesValidity : ensure no times are empty or overlap in the Scheduler
+*/
 function checkTimesValidity() {
     var times = [];
     var from_t;
@@ -105,6 +121,9 @@ function checkTimesValidity() {
 
 }
 
+/*
+deleteRow : ensures all entries are filled in
+*/
 function checkEntriesValidity() {
     var entry;
     for (var i = 0; i < sched_id; i++) {
@@ -135,6 +154,9 @@ function checkEntriesValidity() {
     return true;
 }
 
+/*
+deleteRow : ensures all priorities are filled in
+*/
 function checkPriorities() {
 
     var entry;
@@ -170,7 +192,10 @@ function checkPriorities() {
 
 }
 
-// add a priority attribute to each row
+/*
+insertRow : inserts a new row at the bottom of the schedule table,
+            delete function is passed in which is assigned to each row
+*/
 function insertRow(delete_function) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -254,7 +279,9 @@ function insertRow(delete_function) {
     }
 }
 
-
+/*
+displayMode : changes the main display
+*/
 function displayMode(evt, mode) {
     var i, tabcontent, tablinks;
     document.getElementById("OUTPUT").innerHTML = "";
@@ -271,6 +298,8 @@ function displayMode(evt, mode) {
     evt.currentTarget.className += " active";
 
 }
+/*
+Legacy Code
 
 function removeAutoRow(del_row) {
     jQuery(document).ready(function ($) {
@@ -284,8 +313,11 @@ function removeAutoRow(del_row) {
         })
     })
 }
+*/
 
-
+/*
+addAutoRow : adds a row to the Scheduler that includes autocomplete functionality
+*/
 function addAutoRow() {
     jQuery(document).ready(function ($) {
         $(function() {
@@ -314,6 +346,9 @@ function addAutoRow() {
 
  }
 
+/*
+initialize: initializes autocompletion in the Best Time and Best Places modes
+*/
 function initialize() {
     jQuery(document).ready(function ($) {
     $(function() {
@@ -333,8 +368,6 @@ function initialize() {
                 (place.address_components[2] && place.address_components[2].short_name || '')
             ].join(' ');
             }
-        console.log(address);
-        console.log(place);
         bst_place = place;
         });
 
@@ -355,8 +388,6 @@ function initialize() {
             ].join(' ');
         }
         // add the element to auto_row dictionary
-        console.log(address);
-        console.log(place);
         places[0] = place;
 
         });
@@ -364,12 +395,10 @@ function initialize() {
     })
 }
 
-/* 
-scheduler output: ["place: start time:endtime"]
-bestTime [(hour, ratio)]
-bestPlace { location:(hour, ratio)}
-*/
 
+/*
+loading : displays a loading sign when waiting for output
+*/
 function loading() {
     loopItem += 1;
     if (loopItem == 3) {
@@ -389,6 +418,11 @@ function loading() {
 
 }
 
+
+/*
+submitBST : this function packages the inputted place ID and sends to the Best Time logic module.
+            The data returned from the logic module is then displayed to the user.
+*/
 function submitBST(){
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -418,7 +452,6 @@ function submitBST(){
         data: JSON.stringify(payload),
         contentType: "application/json",
         success: function(data) {
-            console.log(data);
             clearInterval(loadingInterval);
             displayOutputBST(data, entry.name);
         },
@@ -441,6 +474,11 @@ function submitBST(){
     }
 }
 
+/*
+submitBFT : this function calls the Google Maps API to retrieve the top ten results relevant
+            to the user's input. The place IDs of each result is then packaged and sent to the
+            Best Places Logic Module.
+*/
 function submitBFT(){
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -466,7 +504,6 @@ function submitBFT(){
         fetch(proxyurl + url) // https://cors-anywhere.herokuapp.com/https://example.com
         .then(response => response.json())
         .then(contents => {
-            console.log(contents); 
             if (contents.status == "OK") {
             let results = contents.results;
             var placeIds = [];
@@ -517,8 +554,9 @@ function submitBFT(){
 
 }
 
-// need to add different failure message detailing if a location is closed or not
-
+/*
+displayFailureMessage : displays an error message for when user inputs invalid places
+*/
 function displayFailureMessage() {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -535,6 +573,9 @@ function displayFailureMessage() {
     this.output_displayed = true;
 }
 
+/*
+displayFailureMessageSchedule2 : displays an error message for the scheduler when the user inputs an invalid place
+*/
 function displayFailureMessageSchedule2() {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -551,6 +592,9 @@ function displayFailureMessageSchedule2() {
     this.output_displayed = true;
 }
 
+/*
+displayFailureMessageSchedule1 : displays an error message for when the user enters an invalid time range in the scheduler
+*/
 function displayFailureMessageSchedule1() {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -592,9 +636,6 @@ function validPriority(index) {
         priority += index;
     }
     var element = document.getElementById(priority);
-    console.log(priority);
-    console.log(element);
-    console.log(document.getElementById("schedule-table"))
     if (element.value == "") {
         alert("ERROR: PLEASE ENTER VALID PRIORITIES BEFORE ADDING MORE ROWS");  
         return false;
@@ -637,7 +678,9 @@ function getPriority(index) {
     return element.value;
 }
 
-// completely incorrect since don't know the output
+/*
+displayOutputBFT : displays the output returned from the Best Places module
+*/
 function displayOutputBFT(data, names, ids, addresses) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -729,7 +772,9 @@ function displayOutputBFT(data, names, ids, addresses) {
 
 }
 
-
+/*
+displayOutputBST : displays the output returned from the Best Time module
+*/
 function displayOutputBST(data, place) {
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
@@ -793,11 +838,10 @@ function displayOutputBST(data, place) {
 
 }
 
-// need to test clicking submit a bunch of times 
+/*
+displayOutputSchedule : displays the data returned from the Scheduler module
+*/
 function displayOutputSchedule(data, names) {
-    console.log(data);
-    console.log("CALLING DISPLAY SCHEDULE NOW");
-    console.log(this.output_displayed)
     if (this.output_displayed) {
         document.getElementById("OUTPUT").innerHTML = "";
         this.output_displayed = false;
@@ -896,7 +940,6 @@ function displayOutputSchedule(data, names) {
 
 
         }
-    // window.scrollBy(0, 500);
     this.output_displayed = true;
     document.getElementById("defaultOpen").disabled = false;
     document.getElementById("bft_button").disabled = false;
@@ -904,8 +947,11 @@ function displayOutputSchedule(data, names) {
 }
 
 
-// use getPlace() method on listeners to get ids
-
+/*
+submitSCHEDULE : compiles place IDs from the global dictionary 'places' and matches
+                 each place with the inputted times and priority numbers. Sends all
+                 of the data to the Scheduler module.
+*/
 function submitSCHEDULE(){
     // TODO
     var names = {};
@@ -1001,14 +1047,12 @@ function submitSCHEDULE(){
     if (valid) {
         document.getElementById("defaultOpen").disabled = true;
         document.getElementById("bft_button").disabled = true;
-        console.log(payload);
         $.ajax({
             url: "/scheduler/update",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
             success: function(data) {
-                console.log(data);
                 clearInterval(loadingInterval);
                 displayOutputSchedule(data, names);
             },
