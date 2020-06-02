@@ -1,3 +1,12 @@
+"""
+bestPlace.py
+===============================================================================
+Last Modified: 1 June 2020
+Modification By: Morgan Edlund
+Creation Date: 22 May 2020
+Initial Author: Bryan Carl
+===============================================================================
+"""
 import json
 import multiprocessing
 import calendar
