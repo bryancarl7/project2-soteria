@@ -49,7 +49,6 @@ class SimulationManager():
         """
 
         # https://developers.google.com/places/supported_types
-        # TODO: Smart type to simulated filter
         valid_location_types = {"restaurant": cls.files[0],
                                 "store": cls.files[3],
                                 "supermarket": cls.files[1],
