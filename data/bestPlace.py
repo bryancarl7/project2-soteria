@@ -37,7 +37,8 @@ class bestPlace(Resource):
     @staticmethod
     def place_helper(d, location, day, types_dict, test_list):
         '''
-        wrapper for bestPlace call, assigns return to the proxydict.
+        Each thread worker from get_best_place uses this function to assign best_times info to their location.
+        for more info, see get_best_place.
         '''
         ret, flag = bestTime.get_best_time(location, day, types_dict, test_list)
         #print(flag)
@@ -47,8 +48,10 @@ class bestPlace(Resource):
     @staticmethod
     def get_best_place(locations, day, types_dict = None, test_dict = None):
         '''
-        list, string, dict(location: popularity) -> dict(location: (hour, popularity))
+        list(google place ids), string(name of day, Capitalized), dict(location:[google-defined types for location]), 
+        (optional) dict(placeid: popularity)  -> dict(location: (hour, popularity)), dict(location: simulatedflag)
         Given a list of google maps placeid's and the day of the week, returns a dictionary of best times.
+        For exact output of first dict, see bestTime. The second dict is the flags from bestTime, turned into a searchable dict.
         '''
         # setup multiprocessing
         manager = multiprocessing.Manager()

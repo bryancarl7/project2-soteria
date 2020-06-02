@@ -1,28 +1,54 @@
+"""
+Scheduler.py
+===============================================================================
+Last Modified: 1 June 2020
+Modification By: Morgan Edlund
+Creation Date: 22 May 2020
+Initial Author: Bryan Carl
+===============================================================================
+"""
+
 from data.apiHandler import apiKeyLoader
 from flask_restful import Resource, request
 import datetime, calendar, json
 from data.bestPlace import bestPlace
 from copy import deepcopy
 import math
+
+# global defines start here
 PADDING = 0
 '''if we try to insert into an hour with <PADDING minutes left and need to
     add remaining time to the next, we instead ignore it. Mostly for elegance:
     stops situations where you get a schedule of "go to location from 10:58 to 11:43".
+    Set to 0 since bruteforce is default: If we can insert at all, we do it. Pretty schedules are secondary.
 '''
+
 MAX_RECURSION = 3
 '''
 number of locations to bruteforce insert into a schedule at the same time.
-Higher = more optimized lists, but much slower run speeds.
+Higher = more optimized schedules, but much slower run speeds.
 
 '''
 PARTIAL_SCHEDULES = True
 '''
 If we end up in a position where it is impossible to schedule an event due to prior choices, alert the user if true
-crash if false
+crash if false.
+Used only when we're in STRICT mode; Since we accept that our bruteforce algorithm may produce schedules where
+a location is unscheduled, we (currently) always accept partial schedules.
 '''
 
 
 class hour(object):
+    '''
+    Holds locations that are scheduled in this hour.
+    self.id: the hour number in 24 hour format
+    self.locations: list of [location, start, end] lists
+    self.timeleft: free time left in this hour to schedule
+    self.last_open_time:  locations are normally inserted from 0 to 60;
+        however, if the hour after us has to overflow into this hour, 
+        we keep track of the ending time of the second to last location.
+    self.hasafter: Bool telling if a successor hour had to bleed into us.
+    '''
     def __init__(self, id):
         self.id = id
         self.locations = []
@@ -47,20 +73,17 @@ class hour(object):
             self.locations.append( [location, self.last_open_time, self.last_open_time + time])
         self.timeleft -= time
         self.last_open_time += time
-        print("true, time remaining: " + str(self.timeleft))
         return True
 
     def adjust_insert(self, location, time):
-        # as insert, but inserts at the start of the hour instead of the end.
+        # as insert, but inserts location the start of the hour instead of the next available time, shifting other events forwards.
         # used for events that rollover hours.
         if (self.timeleft - time) < 0:
             ''' shifting would result in pushing an event out of this list, say no
-             potential TODO: Return list of events pushed out for rescheduling? Probably not, since pushed out groups have
-             a higher priority than the inserted group.'''
-            print("could not shift locations, despite checking we could?? ")
+                since pushed out groups have either the same or higher priority
+                than the inserted group.'''
             return False
-        print("Before adjustions: ")
-        print(self.locations)
+
         for triplet in self.locations:
             # Shift every location up
             triplet[1] += time
@@ -68,7 +91,6 @@ class hour(object):
         self.locations.insert(0, [location, 0, time])
         self.timeleft -= time
         self.last_open_time += time
-        print("Adjusted list: ")
         print(self.locations)
         return True
 
@@ -87,7 +109,7 @@ class hour(object):
 
     def as_minutes(self):
         '''
-        returns a representation where each item in location is (60*our hour)+minutes. Used for representing multi-hour events.
+        returns a representation where each item in location is (60*id)+minutes. Used for representing multi-hour events.
         '''
         out = []
         offset = 60*self.id
@@ -128,6 +150,7 @@ class scheduleObj(object):
     '''
     Schedule object, handles the logic for trying to insert a given time.
     if STRICT: events will not be allowed to go across hour objects. Otherwise, the scheduler will attempt to reshuffle
+    self.hours: list of hours, wher index = hour.
     '''
     def __init__(self, STRICT = True):
         self.strict = STRICT
@@ -136,7 +159,6 @@ class scheduleObj(object):
             self.hours.append(hour(x))
 
     def insert(self, location, hour, time, closedtimes, pop_times, direction = None):
-        print("attempting insert of place " + location + " at hour " + str(hour) + " with duration " + str(time), end='.')
         hourobj = self.hours[hour]
         if self.strict:
             return hourobj.insert(location, time)
@@ -145,6 +167,7 @@ class scheduleObj(object):
                 # same logic as strict: If we can fully insert now, do so
                 return True
             if hourobj.timeleft <= PADDING:
+                # keep it pretty.
                 return False
 
             success, dir = self.recursive_insert(location, hour, ( time - hourobj.timeleft), closedtimes, pop_times, direction)
@@ -152,7 +175,7 @@ class scheduleObj(object):
             if success == False:
                 return False
             if dir == LEFT:
-                # we inserted to the left; adjust all other times in currhour so we can insert ourselves
+                # we inserted to the left; adjust all other times in curr hour so we can insert ourselves
                 return hourobj.adjust_insert(location, hourobj.timeleft)
             else:
                 return hourobj.insert(location, hourobj.timeleft)
@@ -163,7 +186,7 @@ class scheduleObj(object):
         # time = remaining time to process.
 
         if direction == None:
-            #only check if we need to
+            #only check if not specified
             score, direction = self.generate_zscore(location, hour, time, closedtimes, pop_times)
 
         if direction == LEFT:
@@ -175,12 +198,11 @@ class scheduleObj(object):
         hourobj = self.hours[hour]
         if hour in closedtimes:
             # business is closed at this hour, send failure back up the list
-            print(location + " is closed at " + str(hour))
             return False
         if timeleft <= hourobj.timeleft:
             # We can insert into this slot!
                 return hourobj.adjust_insert(location, timeleft)
-        if hourobj.timeleft == 60 and hour < 23:
+        if hourobj.timeleft == 60 and hour+1 <= 23:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
             # Does not allow for schedules spanning two days.
             if self.insert_right(location, hour+1, timeleft-60, closedtimes):
@@ -193,12 +215,11 @@ class scheduleObj(object):
         hourobj = self.hours[hour]
         if hour in closedtimes:
             # business is closed at this hour, send failure back up the list
-            print(location + " is closed at " + str(hour))
             return False
         if timeleft <= hourobj.timeleft:
             # We can insert into this slot!
                 return hourobj.insert_end(location, timeleft)
-        if hourobj.timeleft == 60 and hour < 23:
+        if hourobj.timeleft == 60 and hour > 0:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the next hour.
             # Does not allow for schedules spanning two days.
             if self.insert_left(location, hour-1, timeleft-60, closedtimes):
@@ -208,12 +229,14 @@ class scheduleObj(object):
             return False
 
     def generate_zscore(self, location, hour, time, closedtimes, pop_times):
-        #print("pop times is" )
-        #print(pop_times)
+        '''
+        Get the zscore for this hour, checking both left and right.
+        Returns the lower zscore and the direction
+        if zscore = 0: We couldn't insert.
+        '''
         left_score = self.generate_zscore_left(location, hour-1, time, closedtimes, pop_times)
         right_score = self.generate_zscore_right(location, hour+1, time, closedtimes, pop_times)
-        #print(left_score)
-        #print(right_score)
+
         if time == 0:
             return (1, RIGHT) #it's ya boi, kludge
         if (left_score == 0) and (right_score == 0):
@@ -240,10 +263,8 @@ class scheduleObj(object):
             #print(location + " is closed at " + str(hour))
             return 0
         if hourobj.hasafter:
-            #print("hour " + str(hour) + " already has event crossing over, cannot insert")
             return 0
         if time <= hourobj.timeleft:
-            #print("successfully finished zscore at: ", str(hour))
             return time * (pop_times[hour])
         if hourobj.timeleft == 60 and hour > 0:
             # we're too big for this timeslot, BUT we can completely occupy this slot and bleed into the previous hour.
@@ -300,8 +321,8 @@ class scheduleObj(object):
             if (internal[-1][0] == cur[0][0]):
                 '''
                 if same location, concatenate
-                so [a, 0, 60] + [a, 0, 30] => [a,0,90] which will get turned back into hours after processing.
-                This allows for multi-hour events to get correctly concatenated, whil being processible for strings
+                so [a, 0, 60] + [a, 60, 90] => [a,0,90] which will get turned back into hours after processing.
+                This allows for multi-hour events to get correctly concatenated, while being processible for strings
                 '''
                 internal[-1][2] = cur[0][2]
                 internal += cur[1:]
@@ -310,6 +331,7 @@ class scheduleObj(object):
         return internal
 
     def current_zscore(self, pop_dict):
+        # get zscore of all locations, given a pop_dict
         zscore = 0
         for x in range[24]:
             hour = self.hours[x]
@@ -354,9 +376,10 @@ class scheduler(Resource):
     @staticmethod
     def build_greedy_list(curr_locations, day, types_dict = None, test_dict = None):
         '''
-        List(placeids), string, optional dict(placeid: list[popularity]) -> list
-        helper method. Builds a sorted list of best hours within a given priority.
-        example:
+        List(placeids), string, dict(placeid: [google types of placeid]), optional dict(placeid: list[popularity]) 
+        -> dict{placeid: [popularity] }, dict{placeid: [hours when closed]}, list[(location, hour, pop)]
+        helper method. Builds several lists for optimize_schedule to use.
+        example for final :
             place x and place y share same priority; x's min popularity is 4 at 6 am , and y's is 6 at 7 am.
             So, the list would look like: [('x', 6, 4), ('y', 7, 6), ....]
             this allows the caller to iterate over the list until the minimum available hour is selected
@@ -387,7 +410,7 @@ class scheduler(Resource):
         for loc in locations:
             schedule = deepcopy(sched_obj)
             if loc == "sentinel":
-                # we don't process this; these should be in their own tiers.
+                # we don't process this; these should be in their own popularity tier.
                 return 0, schedule
             best_hour_score = 144001
             best_hour = 0
@@ -444,9 +467,7 @@ class scheduler(Resource):
                 #locations.remove(loc)
                 #continue
             #at this point, we know what the best hour is to insert this loc: now recursively build lower ones
-            #print(best_hour_score)
-            #print(best_hour)
-            #insert's logic handles shifts
+
             schedule.insert(loc, best_hour, curr_times[loc], closed_times[loc], pop_dict[loc], best_hour_dir)
 
             #otherwise, recurse
@@ -464,11 +485,14 @@ class scheduler(Resource):
     @classmethod
     def optimize_schedule(cls, schedule, day, types_dict = None, test_dict=None, strict = False, bruteforce = True):
         '''
-        Dict(location:(priority, time)), String, optional dict(location:(hour, ratio)) -> dict(location:(time??))
-        time?? is either (from_time and to_time), or the duration in minutes you would be at a location(pending implementation on frontend)
+        Dict(placeid:(priority, duration)), String, Dict(placeid: [google types for placeid]), optional dict(location:(hour, ratio)) 
+        -> dict(location:(duration))
+        The duration is in minutes you would be at a location.
+        if STRICT: Will use a faster algorithm that guarantees optimal schedules, if we do not allow any event to be in more than 1 hour (ie >60 events cannot schedule)
 
         Given an initial user-defined schedule and the weekday the schedule would be followed, tries to optimize it to ensure as little human contact as possible.
-        User-defined priority represents the order to select places: Users are asked to rate places with higher average customers closer to 1
+        User-defined priority represents the order to select places: Users are asked to rate places with higher customers closer to 1. 
+        
         '''
         sched = scheduleObj(strict)
         #builds a list of priorities; the sentinel guarantees the last priority is run through the following loop.

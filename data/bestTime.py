@@ -1,7 +1,7 @@
 """
 bestTime.py
 ===============================================================================
-Last Modified: 25 May 2020
+Last Modified: 1 June 2020
 Modification By: Bryan Carl
 Creation Date: 22 May 2020
 Initial Author: Bryan Carl
@@ -45,14 +45,15 @@ class bestTime(Resource):
     @staticmethod
     def get_best_time(location, day, place_types = [], test_list=None):
         '''
-        string(google places API placeid), string(name of day), (optional) 0-100 ratio int list -> (hour, ratio) list
+        string(google places API placeid), string(name of day), list(google-defined types for location), (optional) 0-100 ratio int list -> (hour, ratio) list, simflag
         Returns a sorted list of times to visit a given location, with times of lowest relative population sorted first.
+        Also returns if Busy Times reporter couldn't get true info, and had to simulate it.
         if test_list is specified, it will validate and use that data for the returned list (allows for testing of logic).
         
         Each pair in the returned list is in the format of (hour in military time, 0-100 ratio rating of relative business). 
 
         Raises:
-            TypeError when test_list specified and doesn't have 24 ints
+            TypeError when test_list specified and doesn't have 24 ints.
 
         '''
         times = None
