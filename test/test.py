@@ -28,6 +28,7 @@ import requests
 # Local Modules
 
 from data.busy_times.reporter import BusyTimesReporter
+from data.scheduler import scheduler
 from data.busy_times.manager import SimulationManager
 from server.api import app, PORT, ENV, HOST
 from data.bestTime import bestTime
@@ -396,7 +397,31 @@ class BestPlaceTests(unittest.TestCase):
             real_result = bp.get_best_place(locations, days[date_index])[0]
             print("location", count, "test")
             self.assertEqual(len(locations), len(real_result))
+            
+class SchedulerTests(unittest.TestCase):
+    """
+    Testing the functionality of Scheduler API and the build greedy list function
+    """
+    def setUp(self):
+        warnings.simplefilter("ignore", ResourceWarning)
 
+    def test_build_greedy_list(self):
+
+        print()
+        print("=" * 80)
+        print("Testing the functionality of Scheduler API")
+        print("Testing the build greedy list function")
+        s = scheduler()
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        locations = ["ChIJcWPM1VYRkFQRpjilF_m5vew", "ChIJNVdWgfiglVQRSuD8w0aQGrk"]
+        print("Checking for locations:", locations)
+        for day in days:
+            result = s.build_greedy_list(locations, day)
+            print("Checking for day:", day)
+            self.assertEqual(len(result), 4)
+            print("correct returned arguments")
+            self.assertEqual(len(result[0]), len(locations))
+            print("correct resorted dictionaries\n")
 
 if __name__ == '__main__':
     unittest.main()
