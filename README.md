@@ -21,13 +21,15 @@ Soteria was created to assist in the mitigation of overcrowded business and publ
 
 1. Clone the repository
 
-`git clone https://github.com/bryancarl7/project2-soteria.git`
+    `git clone https://github.com/bryancarl7/project2-soteria.git`
 
 2. Place the `credentials.ini` in the root directory of the cloned project repository. This file is provided directly by the Soteria team.
 
 3. Install the application
 
-Run `./build.sh` using your favorite Bash supported terminal
+    Run `./build.sh` using your favorite Bash supported terminal (we recommend selecting port 3000)
+
+4. (OPTIONAL) after running the build script use the `-run` or `-skip` flag to only launch the server after initial setup.
 
 _NOTE_: There were multithreading issues on Mac OS X during development, we reflected this in our build<br>
 scripts, however if you run into issue you may have to run command this to allow multithreading: <br>
