@@ -5,6 +5,7 @@ if [ "$1" == "-run" ] ; then
 	echo "                ...Launching Flask Server..."
 	echo "---------------------------------------------------------------"
   python3 -m server.api
+  exit 1
 fi
 
 if [ "$1" == "-windows"  ] ; then
