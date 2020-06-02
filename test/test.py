@@ -192,10 +192,6 @@ class ServerTests(unittest.TestCase):
                             )
                 self.assertEqual(response.status_code, 200)
 
-# Need to discuss:
-# TODO: use unittest.mock when using requests OR Flask app.test_client()
-
-
 class SimulationManagerTests(unittest.TestCase):
 
     def test_simulated_data(self):
@@ -397,7 +393,7 @@ class BestPlaceTests(unittest.TestCase):
             real_result = bp.get_best_place(locations, days[date_index])[0]
             print("location", count, "test")
             self.assertEqual(len(locations), len(real_result))
-            
+
 class SchedulerTests(unittest.TestCase):
     """
     Testing the functionality of Scheduler API and the build greedy list function
