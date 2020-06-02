@@ -27,8 +27,7 @@ Soteria was created to assist in the mitigation of overcrowded business and publ
 
 3. Install the application
 
-`./build_linux` for Linux/MacOS
-Note: For Windows run the Bash script `build_windows.sh`.
+Run `./build.sh` using your favorite Bash supported terminal
 
 ## Usage
 
@@ -78,7 +77,10 @@ The testing framework can be executed at anytime, by running `python3 -m test.te
     * test.py - Main Testing Framework Interface
 * tmp/ - Temporary Directory for Logs
     * soteria.log - Main Log File
-* build_linux - Installation script for Linux/MacOS platforms
+* builds/ - Directory for OS Depdendent Build Scripts
+    * build_linux - Installation script for Linux/MacOS platforms
+    * build_windows.sh - Installation script for Windows platfomrs
+* build.sh - Main Interface for Installing
 * credentials.ini - API keys, must be manually provided and set
 * _\_init_\_.py - Python modular structure
 * requirements.txt - Python third party packages
